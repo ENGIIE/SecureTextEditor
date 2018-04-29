@@ -1,5 +1,5 @@
 import java.security.Security;
-//import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
 /**
  * Basic class to confirm the Bouncy Castle provider is
@@ -9,7 +9,7 @@ public class SimpleProviderTest
 {
     public static void main (String[] args)
     {
-        //Security.addProvider(new BouncyCastleProvider());
+        Security.addProvider(new BouncyCastleProvider());
         String providerName = "BC";
 
         if(Security.getProvider(providerName) == null)
