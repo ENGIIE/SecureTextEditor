@@ -28,7 +28,7 @@
             <Label text="Username" />
             <PasswordField GridPane.columnIndex="1" GridPane.rowIndex="1" />
             <Button fx:id="register" mnemonicParsing="false" onAction="#handleRegisterButtonAction" text="Register" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
-            <Button mnemonicParsing="false" text="Login" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
+            <Button fx:id="login" mnemonicParsing="false" onAction="#handleLoginButtonAction" text="Login" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.valignment="CENTER" />
          </children>
          <padding>
             <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
