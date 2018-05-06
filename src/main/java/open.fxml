@@ -18,12 +18,12 @@
             <Insets bottom="25.0" left="25.0" right="25.0" top="25.0" />
          </padding>
          <children>
-            <ListView prefHeight="200.0" prefWidth="200.0" />
+            <ListView fx:id="listView" prefHeight="200.0" prefWidth="200.0" />
             <Button fx:id="open" mnemonicParsing="false" onAction="#handleOpenButtonAction" prefHeight="29.0" prefWidth="162.0" text="Open" />
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0">
                <children>
-                  <TextField />
-                  <Button fx:id="newFile" mnemonicParsing="false" onAction="#handleNewFileButtonAction" text="New FIle" />
+                  <TextField fx:id="fileName" />
+                  <Button fx:id="newFile" mnemonicParsing="false" onAction="#handleNewFileButtonAction" text="New File" />
                </children>
             </HBox>
          </children>
