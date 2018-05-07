@@ -55,9 +55,13 @@ public class XMLManager {
         try {
 
             inputStream = new FileReader(file);
-            int c;
-            while ((c = inputStream.read()) != -1) {
-                text += c;
+            BufferedReader br = new BufferedReader(inputStream);
+
+            String zeile = "";
+
+            while( (zeile = br.readLine()) != null )
+            {
+                text+= zeile;
             }
             inputStream.close();
         }
@@ -65,6 +69,7 @@ public class XMLManager {
             ex.printStackTrace();
         }
 
+        System.out.println(text);
         return text;
     }
 

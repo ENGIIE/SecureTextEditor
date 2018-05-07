@@ -4,9 +4,12 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -91,11 +94,23 @@ public class FXMLController {
 
         FileChooser chooser = new FileChooser();
         File f = chooser.showOpenDialog((Stage) open.getScene().getWindow());
+
         Parent root = FXMLLoader.load(getClass().getResource("editor.fxml"));
 
+        //txta.setText("123öö");
+        System.out.println(f);
+
         Stage stage = (Stage) open.getScene().getWindow();
-        textArea.setText("1234");
-        stage.setScene(new Scene(root));
+        Scene scene = new Scene(root);
+
+        Node node = scene.lookup("#textArea");
+        TextArea txta = (TextArea) node;
+        txta.setText(xmlm.loadText(f));
+
+        stage.setScene(scene);
+
+        //textArea.setText("abc");
+
     }
 
 
