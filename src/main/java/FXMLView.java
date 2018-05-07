@@ -17,11 +17,13 @@ public class FXMLView extends Application {
     @Override
     public void start(final Stage primaryStage) throws IOException {
 
-        Parent root = FXMLLoader.load(getClass().getResource("login.fxml"));
+        // Loading first fxml file to be displayed in parent (root)
+        Parent root = FXMLLoader.load(getClass().getResource("startmenu.fxml"));
 
-
+        // Create new scene with with parent (root)
         Scene scene = new Scene(root, 500, 500);
 
+        // Set title scene and display window
         primaryStage.setTitle("FXML Welcome");
         primaryStage.setScene(scene);
         primaryStage.show();

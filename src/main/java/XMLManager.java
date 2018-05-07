@@ -12,6 +12,8 @@ public class XMLManager {
     FileReader inputStream;
     String tempname;
     String text;
+    Boolean nFile = true;
+    String path;
 
 
     public XMLManager () {
@@ -24,24 +26,29 @@ public class XMLManager {
 
 
     public void setFileName (String filename) {
+
         tempname = filename;
     }
 
 
-    public void saveText (String text) throws IOException {
+    public void saveText (String path, String text) throws IOException {
 
 
         try {
 
-            //inputStream = new FileReader("test.txt");
-            outputStream = new FileWriter("./src/main/java/savefiles/"+tempname+".txt");
+            if(path != null){
+                //outputStream = new FileWriter("./src/main/java/savefiles/"+tempname+".txt");
+                outputStream = new FileWriter(path);
+                outputStream.write(text);
+                outputStream.close();
+                this.path = path;
+            }else {
+                outputStream = new FileWriter(this.path);
+                outputStream.write(text);
+                outputStream.close();
+            }
 
-            outputStream.write(text);
-            outputStream.close();
-           // int c;
-            //while ((c = inputStream.read()) != -1) {
-                //outputStream.write(c);
-           // }
+
         }
         catch (Exception ex){
             ex.printStackTrace();
@@ -53,6 +60,16 @@ public class XMLManager {
 
 
         try {
+
+            nFile = false;
+
+            String filename = null;
+            int pos = file.getName().lastIndexOf(".");
+            if(pos != -1) {
+                filename = file.getName().substring(0, pos);
+            }
+
+            tempname = filename;
 
             inputStream = new FileReader(file);
             BufferedReader br = new BufferedReader(inputStream);
@@ -73,5 +90,17 @@ public class XMLManager {
         return text;
     }
 
+
+    public boolean isNewFile (){
+        return nFile;
+    }
+
+    public void setToNewFile () {
+        nFile = true;
+    }
+
+    public void setPath (String path) {
+        this.path = path;
+    }
 
 }

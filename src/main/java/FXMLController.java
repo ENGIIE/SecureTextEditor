@@ -8,12 +8,11 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.File;
 import java.io.IOException;
 import java.util.Set;
@@ -43,9 +42,6 @@ public class FXMLController {
 
     @FXML
     private Button newFile;
-
-    @FXML
-    private Button load;
 
     @FXML
     private Button save;
@@ -82,34 +78,45 @@ public class FXMLController {
     protected void handleLoginButtonAction(ActionEvent event) throws IOException {
         System.out.println("Login");
 
-        Parent root = FXMLLoader.load(getClass().getResource("open.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("startmenu.fxml"));
         Stage stage = (Stage) login.getScene().getWindow();
         stage.setScene(new Scene(root));
     }
+
+
+
 
 
     @FXML
     protected void handleOpenButtonAction(ActionEvent event) throws IOException {
         System.out.println("Open");
 
+
+
+
         FileChooser chooser = new FileChooser();
-        File f = chooser.showOpenDialog((Stage) open.getScene().getWindow());
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text Files", "*.txt"));
+        File f = chooser.showOpenDialog(open.getScene().getWindow());
 
-        Parent root = FXMLLoader.load(getClass().getResource("editor.fxml"));
+        if (f != null) {
 
-        //txta.setText("123öö");
-        System.out.println(f);
+            xmlm.setPath(f.getPath());
 
-        Stage stage = (Stage) open.getScene().getWindow();
-        Scene scene = new Scene(root);
+            Parent root = FXMLLoader.load(getClass().getResource("editor.fxml"));
 
-        Node node = scene.lookup("#textArea");
-        TextArea txta = (TextArea) node;
-        txta.setText(xmlm.loadText(f));
+            System.out.println(f);
 
-        stage.setScene(scene);
+            Stage stage = (Stage) open.getScene().getWindow();
+            Scene scene = new Scene(root);
 
-        //textArea.setText("abc");
+            Node node = scene.lookup("#textArea");
+            TextArea txta = (TextArea) node;
+            txta.setText(xmlm.loadText(f));
+
+            stage.setScene(scene);
+
+        }
+
 
     }
 
@@ -118,27 +125,53 @@ public class FXMLController {
     protected void handleNewFileButtonAction(ActionEvent event) throws IOException {
         System.out.println("New File");
 
-        xmlm.setFileName(fileName.getText());
+        //xmlm.setFileName(fileName.getText());
+        xmlm.setToNewFile();
 
         Parent root = FXMLLoader.load(getClass().getResource("editor.fxml"));
         Stage stage = (Stage) newFile.getScene().getWindow();
-        stage.setScene(new Scene(root));
+        Scene scene = new Scene(root);
+
+        Node node = scene.lookup("#textArea");
+        TextArea txta = (TextArea) node;
+        txta.setText(null);
+
+        stage.setScene(scene);
 
     }
 
-    @FXML
-    protected void handleLoadButtonAction(ActionEvent event) throws IOException {
-        System.out.println("Load");
-        Parent root = FXMLLoader.load(getClass().getResource("open.fxml"));
-        Stage stage = (Stage) load.getScene().getWindow();
-        stage.setScene(new Scene(root));
-    }
 
     @FXML
     protected void handleSaveButtonAction(ActionEvent event) throws IOException {
         System.out.println("Save");
 
-        xmlm.saveText(textArea.getText());
+        if(xmlm.isNewFile() == true) {
+
+            FileChooser chooser = new FileChooser();
+            chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text Files", "*.txt"));
+            File f = chooser.showSaveDialog(save.getScene().getWindow());
+
+            if (f != null) {
+
+                try {
+                    xmlm.setToNewFile();
+                    xmlm.saveText(f.getAbsolutePath(),textArea.getText());
+
+                } catch (IOException ex) {
+                    System.out.println(ex.getMessage());
+                }
+
+            }
+
+
+
+        }else {
+
+            xmlm.saveText(null,textArea.getText());
+
+        }
+
+
 
     }
 
