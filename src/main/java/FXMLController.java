@@ -35,6 +35,11 @@ public class FXMLController {
     @FXML
     private TextArea textArea;
 
+    @FXML
+    private MenuItem misave;
+
+    @FXML
+    private MenuItem miaes;
 
     //FXML Action Events
 
@@ -169,6 +174,55 @@ public class FXMLController {
             //Save Document in Path
             manager.saveText(textArea.getText());
         }
+
+
+    }
+
+    /**
+     * ActionEvent AES Button
+     * @param event
+     * @throws IOException
+     */
+    @FXML
+    protected void handleAESButtonAction(ActionEvent event) throws IOException {
+        System.out.println("AES");
+
+        //If there is no currentPath
+        if(manager.getPath()== null) {
+            //Creating FileChooser
+            FileChooser chooser = new FileChooser();
+
+            //Filter only Txt Files
+            chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text Files", "*.txt"));
+
+            //Show Save Dialog
+            File f = chooser.showSaveDialog(save.getScene().getWindow());
+
+            //If file is saved
+            if (f != null) {
+
+                //Save fileName
+                manager.setFileName(f.getName());
+
+                //Save currentPath
+                manager.setPath(f.getPath());
+
+                try {
+                    //Save Document in Path
+                    manager.aesEncryptText(textArea.getText());
+
+                } catch (IOException ex) {
+                    System.out.println(ex.getMessage());
+                }
+
+            }
+
+
+        }else{
+            //Save Document in Path
+            manager.aesEncryptText(textArea.getText());
+        }
+
 
 
     }

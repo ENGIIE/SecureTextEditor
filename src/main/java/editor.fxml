@@ -2,6 +2,8 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
@@ -30,6 +32,15 @@
                      <font>
                         <Font name="Calibri Light" size="15.0" />
                      </font></Button>
+                  <MenuButton fx:id="mbsave" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="30.0" prefWidth="90.0" text="Save" textAlignment="CENTER">
+                    <items>
+                      <MenuItem fx:id="misave" mnemonicParsing="false" onAction="#handleSaveButtonAction" text="Normal" />
+                      <MenuItem fx:id="miaes" mnemonicParsing="false" onAction="#handleAESButtonAction" text="AES" />
+                    </items>
+                     <font>
+                        <Font name="Calibri Light" size="15.0" />
+                     </font>
+                  </MenuButton>
                </children>
             </HBox>
             <TextArea fx:id="textArea" prefHeight="520.0" prefWidth="600.0">

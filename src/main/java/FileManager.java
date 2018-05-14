@@ -1,5 +1,12 @@
-import java.io.*;
+import chapter2.Utils;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.*;
+import java.security.Provider;
+import java.security.Security;
+import java.util.Arrays;
 
 public class FileManager {
 
@@ -56,6 +63,72 @@ public class FileManager {
             ex.printStackTrace();
         }
 
+    }
+
+
+    /**
+     * Using AES
+     * @param text
+     * @throws IOException
+     */
+    public void aesEncryptText (String text) throws IOException {
+
+
+        try {
+
+            //add BouncyCastle Provider
+            Security.addProvider(new BouncyCastleProvider());
+            Provider provider = Security.getProvider("BC");
+
+            //Text into byte array
+            byte[] input = text.getBytes();
+
+            System.out.println(Arrays.toString(input));
+
+            //Key byte array
+            byte[]        keyBytes = new byte[] {
+                    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+                    0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+                    0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17 };
+
+            //Creating new SecretKey
+            SecretKeySpec key = new SecretKeySpec(keyBytes, "AES");
+
+            //Instantiate Cipher
+            Cipher cipher = Cipher.getInstance("AES/ECB/NoPadding", "BC");
+
+
+            System.out.println("input text : " + Utils.toHex(input));
+
+            // encryption pass
+
+            //
+            byte[] cipherText = new byte[input.length];
+
+            cipher.init(Cipher.ENCRYPT_MODE, key);
+
+            int ctLength = cipher.update(input, 0, input.length, cipherText, 0);
+
+            ctLength += cipher.doFinal(cipherText, ctLength);
+
+            System.out.println("cipher text: " + Utils.toHex(cipherText) + " bytes: " + ctLength);
+
+            // decryption pass
+
+            byte[] plainText = new byte[ctLength];
+
+            cipher.init(Cipher.DECRYPT_MODE, key);
+
+            int ptLength = cipher.update(cipherText, 0, ctLength, plainText, 0);
+
+            ptLength += cipher.doFinal(plainText, ptLength);
+
+            System.out.println("plain text : " + Utils.toHex(plainText) + " bytes: " + ptLength);
+
+
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
     }
 
 
