@@ -1,4 +1,4 @@
-package Extended;
+package Extensions;
 
 import javafx.application.Application;
 import javafx.geometry.Insets;
@@ -13,8 +13,6 @@ import javafx.scene.control.Button;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
-
-import java.awt.*;
 
 
 public class Login extends Application {

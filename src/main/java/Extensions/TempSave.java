@@ -1,4 +1,4 @@
-package Extended;
+package Extensions;
 
 public class TempSave {
 
