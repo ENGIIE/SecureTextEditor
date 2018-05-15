@@ -28,6 +28,15 @@
                      <font>
                         <Font name="Calibri Light" size="15.0" />
                      </font></Button>
+                  <MenuButton fx:id="mbopen" alignment="CENTER" contentDisplay="CENTER" layoutX="490.0" layoutY="15.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="90.0" text="Open" textAlignment="CENTER">
+                     <items>
+                        <MenuItem fx:id="miopen" mnemonicParsing="false" onAction="#handleOpenButtonAction" text="Normal" />
+                        <MenuItem fx:id="miopenaes" mnemonicParsing="false" onAction="#handleAESOpenButtonAction" text="AES" />
+                     </items>
+                     <font>
+                        <Font name="Calibri Light" size="15.0" />
+                     </font>
+                  </MenuButton>
                   <Button fx:id="save" alignment="CENTER" mnemonicParsing="false" onAction="#handleSaveButtonAction" prefHeight="30.0" prefWidth="90.0" text="Save" textAlignment="CENTER">
                      <font>
                         <Font name="Calibri Light" size="15.0" />
@@ -35,7 +44,7 @@
                   <MenuButton fx:id="mbsave" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="30.0" prefWidth="90.0" text="Save" textAlignment="CENTER">
                     <items>
                       <MenuItem fx:id="misave" mnemonicParsing="false" onAction="#handleSaveButtonAction" text="Normal" />
-                      <MenuItem fx:id="miaes" mnemonicParsing="false" onAction="#handleAESButtonAction" text="AES" />
+                      <MenuItem fx:id="miaes" mnemonicParsing="false" onAction="#handleAESSaveButtonAction" text="AES" />
                     </items>
                      <font>
                         <Font name="Calibri Light" size="15.0" />
