@@ -2,6 +2,8 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.effect.SepiaTone?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
@@ -30,10 +32,15 @@
                   <Font name="Calibri Light" size="15.0" />
                </font>
             </Button>
-            <Button fx:id="open" mnemonicParsing="false" onAction="#handleOpenButtonAction" prefHeight="30.0" prefWidth="240.0" text="Open File">
+            <MenuButton fx:id="mbopen" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="30.0" prefWidth="240.0" text="Open" textAlignment="CENTER">
+               <items>
+                  <MenuItem fx:id="miopen" mnemonicParsing="false" onAction="#handleOpenButtonAction" text="Normal" />
+                  <MenuItem fx:id="miopenaes" mnemonicParsing="false" onAction="#handleAESOpenButtonAction" text="AES" />
+               </items>
                <font>
                   <Font name="Calibri Light" size="15.0" />
-               </font></Button>
+               </font>
+            </MenuButton>
          </children>
       </VBox>
    </children>

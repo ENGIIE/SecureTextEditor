@@ -24,10 +24,6 @@
                         <Font name="Calibri Light" size="15.0" />
                      </font>
                   </Button>
-                  <Button fx:id="open" alignment="CENTER" mnemonicParsing="false" onAction="#handleOpenButtonAction" prefHeight="30.0" prefWidth="90.0" text="Open" textAlignment="CENTER">
-                     <font>
-                        <Font name="Calibri Light" size="15.0" />
-                     </font></Button>
                   <MenuButton fx:id="mbopen" alignment="CENTER" contentDisplay="CENTER" layoutX="490.0" layoutY="15.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="90.0" text="Open" textAlignment="CENTER">
                      <items>
                         <MenuItem fx:id="miopen" mnemonicParsing="false" onAction="#handleOpenButtonAction" text="Normal" />
@@ -37,10 +33,6 @@
                         <Font name="Calibri Light" size="15.0" />
                      </font>
                   </MenuButton>
-                  <Button fx:id="save" alignment="CENTER" mnemonicParsing="false" onAction="#handleSaveButtonAction" prefHeight="30.0" prefWidth="90.0" text="Save" textAlignment="CENTER">
-                     <font>
-                        <Font name="Calibri Light" size="15.0" />
-                     </font></Button>
                   <MenuButton fx:id="mbsave" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="30.0" prefWidth="90.0" text="Save" textAlignment="CENTER">
                     <items>
                       <MenuItem fx:id="misave" mnemonicParsing="false" onAction="#handleSaveButtonAction" text="Normal" />
