@@ -32,10 +32,11 @@
                   <Font name="Calibri Light" size="15.0" />
                </font>
             </Button>
-            <MenuButton fx:id="mbopen" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="30.0" prefWidth="240.0" text="Open" textAlignment="CENTER">
+            <MenuButton fx:id="mbopen" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" mnemonicParsing="false" prefHeight="30.0" prefWidth="240.0" text="Open" textAlignment="CENTER">
                <items>
                   <MenuItem fx:id="miopen" mnemonicParsing="false" onAction="#handleOpenButtonAction" text="Normal" />
                   <MenuItem fx:id="miopenaes" mnemonicParsing="false" onAction="#handleAESOpenButtonAction" text="AES" />
+                  <MenuItem fx:id="miopendes" mnemonicParsing="false" onAction="#handleDESOpenButtonAction" text="DES" />
                </items>
                <font>
                   <Font name="Calibri Light" size="15.0" />

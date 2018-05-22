@@ -27,11 +27,15 @@ public class FileManager {
             (byte)0x88, (byte)0x99, (byte)0xaa, (byte)0xbb,
             (byte)0xcc, (byte)0xdd, (byte)0xee, (byte)0xff };
 
-    //Key byte array
-    byte[]        keyBytes = new byte[] {
+    //AES Key byte array
+    byte[] aeskeyBytes = new byte[] {
             0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
             0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
             0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17 };
+
+    //DES Key byte array
+    byte[] deskeyBytes = new byte[] {
+            0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07 };
 
 
     /**
@@ -107,13 +111,13 @@ public class FileManager {
      */
     public void aesEncryptText (String text) throws IOException {
         try {
-            System.out.println("Encrypt Text: " + text);
+            System.out.println("AES Encrypt Text: " + text);
 
             //Text into byte array
             byte[] input = text.getBytes();
-            System.out.println("input text : " + Utils.toHex(input));
+            System.out.println("AES input text : " + Utils.toHex(input));
             //Creating new SecretKey
-            SecretKeySpec key = new SecretKeySpec(keyBytes, "AES");
+            SecretKeySpec key = new SecretKeySpec(aeskeyBytes, "AES");
             //Instantiate Cipher
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS7Padding", "BC");
 
@@ -128,9 +132,9 @@ public class FileManager {
             ctLength += cipher.doFinal(cipherText, ctLength);
             //cipherText to String
             //Base64 encoding
-            System.out.println("cipher text: " + Utils.toHex(cipherText) + " bytes: " + ctLength);
+            System.out.println("AES cipher text: " + Utils.toHex(cipherText) + " bytes: " + ctLength);
             String cipherTextString = Base64.toBase64String(cipherText);
-            System.out.println("Encrypt CipherTextString: " + cipherTextString);
+            System.out.println("AES Encrypt CipherTextString: " + cipherTextString);
 
             //Writing encrypted text into file
             //Current Path has to be available
@@ -173,17 +177,17 @@ public class FileManager {
             fileReader.close();
 
             //Creating new SecretKey
-            SecretKeySpec key = new SecretKeySpec(keyBytes, "AES");
+            SecretKeySpec key = new SecretKeySpec(aeskeyBytes, "AES");
             //Instantiate Cipher
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS7Padding", "BC");
 
             // decryption pass
-            System.out.println("Decrypt Text: " + text);
+            System.out.println("AES Decrypt Text: " + text);
             //Decode text into cipherTextRead input array
             byte[] cipherText = Base64.decode(text.getBytes());
             //Important for the right length
             int ctLength = cipherText.length;
-            System.out.println("cipher text: " + Utils.toHex(cipherText) + " bytes: " + ctLength);
+            System.out.println("AES cipher text: " + Utils.toHex(cipherText) + " bytes: " + ctLength);
             //Create plainText output array
             byte[] plainText = new byte[ctLength];
             //Initialize Cipher
@@ -192,12 +196,118 @@ public class FileManager {
             int ptLength = cipher.update(cipherText, 0, ctLength, plainText, 0);
             //Cipher doFinal()
             ptLength += cipher.doFinal(plainText, ptLength);
-            System.out.println("plain text : " + Utils.toHex(plainText) + " bytes: " + ptLength);
+            System.out.println("AES plain text : " + Utils.toHex(plainText) + " bytes: " + ptLength);
             //plainText array to String
             String plainTextString = new String(plainText);
-            System.out.println("Decrypt plainTextString : " + text);
+            System.out.println("AES Decrypt plainTextString : " + text);
             text = plainTextString;
-            System.out.println("Decrypt TextString : " + text);
+            System.out.println("AES Decrypt TextString : " + text);
+        }
+        catch (Exception ex){
+            ex.printStackTrace();
+        }
+        return text;
+    }
+
+
+    /**
+     * Using DES Encryption
+     * @param text
+     * @throws IOException
+     */
+    public void desEncryptText (String text) throws IOException {
+        try {
+            System.out.println("DES Encrypt Text: " + text);
+
+            //Text into byte array
+            byte[] input = text.getBytes();
+            System.out.println("DES input text : " + Utils.toHex(input));
+            //Creating new SecretKey
+            SecretKeySpec deskey = new SecretKeySpec(deskeyBytes, "DES");
+            //Instantiate Cipher
+            Cipher cipher = Cipher.getInstance("DES/ECB/PKCS7Padding", "BC");
+
+            // encryption pass
+            //Initiate Cipher init()
+            cipher.init(Cipher.ENCRYPT_MODE, deskey);
+            //Create cipherText output array
+            byte[] cipherText = new byte[cipher.getOutputSize(input.length)];
+            //Block by block encryption from input into cipherText update()
+            int ctLength = cipher.update(input, 0, input.length, cipherText, 0);
+            //Get ctLength, doFinal()
+            ctLength += cipher.doFinal(cipherText, ctLength);
+            //cipherText to String
+            //Base64 encoding
+            System.out.println("DES cipher text: " + Utils.toHex(cipherText) + " bytes: " + ctLength);
+            String cipherTextString = Base64.toBase64String(cipherText);
+            System.out.println("DES Encrypt CipherTextString: " + cipherTextString);
+
+            //Writing encrypted text into file
+            //Current Path has to be available
+            if(currentPath != null) {
+                //Create new FileWriter
+                fileWriter = new FileWriter(currentPath);
+                //Write Text into File
+                fileWriter.write(cipherTextString);
+                //Close Writer
+                fileWriter.close();
+            }
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+    }
+
+
+    /**
+     * Using DES Decryption
+     * @param file
+     * @return text
+     * @throws IOException
+     */
+    public String desDecryptText (File file) throws IOException {
+        //Current Text
+        String text = "";
+        try {
+            //Create new FileReader and BufferedReader
+            fileReader = new FileReader(file);
+            BufferedReader bufferedReader = new BufferedReader(fileReader);
+            //Current row
+            String row = "";
+            //As long as there are still lines
+            while( (row = bufferedReader.readLine()) != null )
+            {
+                //Append row on String text
+                text+= row;
+            }
+            //Close FileReader
+            fileReader.close();
+
+            //Creating new SecretKey
+            SecretKeySpec deskey = new SecretKeySpec(deskeyBytes, "DES");
+            //Instantiate Cipher
+            Cipher cipher = Cipher.getInstance("DES/ECB/PKCS7Padding", "BC");
+
+            // decryption pass
+            System.out.println("DES Decrypt Text: " + text);
+            //Decode text into cipherTextRead input array
+            byte[] cipherText = Base64.decode(text.getBytes());
+            //Important for the right length
+            int ctLength = cipherText.length;
+            System.out.println("DES cipher text: " + Utils.toHex(cipherText) + " bytes: " + ctLength);
+            //Create plainText output array
+            byte[] plainText = new byte[ctLength];
+            //Initialize Cipher
+            cipher.init(Cipher.DECRYPT_MODE, deskey);
+            //Decrypt block by block into plainText update()
+            int ptLength = cipher.update(cipherText, 0, ctLength, plainText, 0);
+            //Cipher doFinal()
+            ptLength += cipher.doFinal(plainText, ptLength);
+            System.out.println("DES plain text : " + Utils.toHex(plainText) + " bytes: " + ptLength);
+            //plainText array to String
+            String plainTextString = new String(plainText);
+            System.out.println("DES Decrypt plainTextString : " + text);
+            text = plainTextString;
+            System.out.println("DES Decrypt TextString : " + text);
         }
         catch (Exception ex){
             ex.printStackTrace();
