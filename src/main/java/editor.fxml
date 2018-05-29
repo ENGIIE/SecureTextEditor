@@ -54,6 +54,11 @@
                         <Font name="Calibri Light" size="15.0" />
                      </font>
                   </MenuButton>
+                  <Button fx:id="settings" mnemonicParsing="false" onAction="#handleSettingsButtonAction" prefHeight="30.0" prefWidth="90.0" text="Settings">
+                     <font>
+                        <Font name="Calibri Light" size="15.0" />
+                     </font>
+                  </Button>
                </children>
             </HBox>
             <TextArea fx:id="textArea" prefHeight="520.0" prefWidth="600.0">

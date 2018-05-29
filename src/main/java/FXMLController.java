@@ -32,9 +32,49 @@ public class FXMLController {
     private Button newFile;
     @FXML
     private TextArea textArea;
+    @FXML
+    private Button back;
+    @FXML
+    private Button settings;
 
 
     //FXML Action Events
+
+    /**
+     * ActionEvent Settings Button
+     * @param event
+     * @throws IOException
+     */
+    @FXML
+    protected void handleSettingsButtonAction(ActionEvent event) throws IOException {
+        System.out.println("Settings");
+        //Load fxml file in Parent root
+        Parent root = FXMLLoader.load(getClass().getResource("settings.fxml"));
+        //Get current Stage
+        Stage stage = (Stage) settings.getScene().getWindow();
+        //Create Scene with root element
+        Scene scene = new Scene(root);
+        //Set the new Scene on the Stage
+        stage.setScene(scene);
+    }
+
+    /**
+     * ActionEvent Back Button
+     * @param event
+     * @throws IOException
+     */
+    @FXML
+    protected void handleBackButtonAction(ActionEvent event) throws IOException {
+        System.out.println("Back");
+        //Load fxml file in Parent root
+        Parent root = FXMLLoader.load(getClass().getResource("editor.fxml"));
+        //Get current Stage
+        Stage stage = (Stage) back.getScene().getWindow();
+        //Create Scene with root element
+        Scene scene = new Scene(root);
+        //Set the new Scene on the Stage
+        stage.setScene(scene);
+    }
 
     /**
      * ActionEvent NewFile Button
