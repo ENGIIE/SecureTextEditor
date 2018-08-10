@@ -1,3 +1,5 @@
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -6,8 +8,10 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
-
+import org.w3c.dom.Document;
+import org.xml.sax.SAXException;
 import java.io.File;
 import java.io.IOException;
 
@@ -17,7 +21,9 @@ public class FXMLController {
     /**
      * Create FileManager Object
      */
-    private static FileManager manager = new FileManager();
+    private static FileManager fileManager = new FileManager();
+    private static Settings settingoptions = new Settings();
+    private static SettingsManager settingsManager = new SettingsManager();
 
     // FXML File Elements
     @FXML
@@ -31,11 +37,26 @@ public class FXMLController {
     @FXML
     private Button newFile;
     @FXML
+    private Button nkFile;
+    @FXML
     private TextArea textArea;
     @FXML
-    private Button back;
+    private Button apply;
     @FXML
     private Button settings;
+    @FXML
+    private CheckBox cbpbe;
+    @FXML
+    private PasswordField pfpbe;
+    @FXML
+    private ComboBox cbalgo;
+    @FXML
+    private ComboBox keysize;
+    @FXML
+    private ComboBox cbmode;
+    @FXML
+    private ComboBox cbpad;
+
 
 
     //FXML Action Events
@@ -46,16 +67,177 @@ public class FXMLController {
      * @throws IOException
      */
     @FXML
-    protected void handleSettingsButtonAction(ActionEvent event) throws IOException {
+    protected void handleSettingsButtonAction(ActionEvent event) throws IOException, SAXException {
         System.out.println("Settings");
         //Load fxml file in Parent root
         Parent root = FXMLLoader.load(getClass().getResource("settings.fxml"));
-        //Get current Stage
-        Stage stage = (Stage) settings.getScene().getWindow();
+        //New Stage
+        Stage stage = new Stage ();
+        stage.initModality(Modality.WINDOW_MODAL);
         //Create Scene with root element
         Scene scene = new Scene(root);
+
+
+        try {
+            Document document = settingsManager.getDocument();
+
+            //ADD PBE Checkbox
+            Node node = scene.lookup("#cbpbe");
+            CheckBox cbpbe = (CheckBox) node;
+            cbpbe.setSelected(fileManager.getData().getPbe());
+
+            //ADD PBE Passwordfield
+            node = scene.lookup("#pfpbe");
+            PasswordField pfpbe = (PasswordField) node;
+            if(!cbpbe.isSelected()){pfpbe.setDisable(true);}else{pfpbe.setDisable(false);}
+            pfpbe.setText(fileManager.getData().getPassword());
+
+
+            //ADD Algorithms to ComboBox
+            node = scene.lookup("#cbalgo");
+            ComboBox cba = (ComboBox) node;
+            settingsManager.addAllElements("algorithm", cba, fileManager.getData().getAlgo(), "name");
+            cba.getSelectionModel().select(fileManager.getData().getAlgo());
+
+            //ADD Keysizes to ComboBox
+            node = scene.lookup("#keysize");
+            ComboBox ks = (ComboBox) node;
+            settingsManager.addAllElements("keysize", ks, fileManager.getData().getKeysize(),"name");
+            ks.getSelectionModel().select( settingsManager.getIndex("keysize", fileManager.getData().getKeysize()));
+
+            //ADD Modes to ComboBox
+            node = scene.lookup("#cbmode");
+            ComboBox cbm = (ComboBox) node;
+            settingsManager.addAllElements("mode", cbm, fileManager.getData().getPad(), "name");
+            cbm.getSelectionModel().select(fileManager.getData().getMode());
+
+
+            //ADD Paddings to ComboBox
+            node = scene.lookup("#cbpad");
+            ComboBox cbp = (ComboBox) node;
+            settingsManager.addAllElements("padding", cbp, fileManager.getData().getPad(),"name");
+            cbp.getSelectionModel().select(fileManager.getData().getPad());
+
+            //PBECheckbox initial
+            if(cbpbe.isSelected() == true){
+                pfpbe.setDisable(false);
+                cba.getItems().clear();
+                settingsManager.getElementsByBoolean("algorithm", "pbe", cba);
+                cba.getSelectionModel().select(fileManager.getData().getAlgo());
+
+            }
+
+            //PBE Checkbox Listener
+            cbpbe.selectedProperty().addListener(new ChangeListener<Boolean>() {
+                @Override
+                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                    System.out.println(cbpbe.isSelected());
+                    if(cbpbe.isSelected() == true){
+                        pfpbe.setDisable(false);
+                        cba.getItems().clear();
+                        settingsManager.getElementsByBoolean("algorithm", "pbe", cba);
+                        cba.getSelectionModel().select(fileManager.getData().getAlgo());
+
+                    }else {
+                        pfpbe.setDisable(true);
+                        cba.getItems().clear();
+                        settingsManager.addAllElements("algorithm", cba, fileManager.getData().getAlgo(),"name");
+                        cba.getSelectionModel().select(0);
+                    }
+                    System.out.println("Changed");
+                }
+            });
+
+
+            //Algorithm initial
+            //Modes
+            int algid = -1;
+            algid = fileManager.getData().getAlgo();
+            for(int i=0; i<cba.getItems().size(); i++){
+             if(cba.getItems().get(i).toString() == settingsManager.getElementName("algorithm", algid)){
+                 cba.getSelectionModel().select(i);
+             }
+            }
+            System.out.println("AlgoID:"+algid);
+            cbm.getItems().clear();
+            settingsManager.addSubelements("algorithm", algid, "mode", "modeid",cbm);
+            cbm.getSelectionModel().select(fileManager.getData().getMode());
+
+            //Keysize
+            ks.getItems().clear();
+            settingsManager.addSubelements("algorithm", algid, "keysize", "keyid", ks);
+            int indx = 0;
+            indx = settingsManager.getIndex("keysize", fileManager.getData().getKeysize());
+            ks.getSelectionModel().select(indx);
+
+            //Algorithm Listener
+            cba.valueProperty().addListener((obs, oldValue, newValue) -> {
+                if (newValue == null) {
+
+                } else {
+
+                    //Modes
+                    int algoid = -1;
+                    algoid = settingsManager.getIndex("algorithm",  cba.getSelectionModel().getSelectedItem().toString());
+                    System.out.println("AlgoID:"+algoid);
+                    cbm.getItems().clear();
+                    settingsManager.addSubelements("algorithm", algoid, "mode", "modeid",cbm);
+                    cbm.getSelectionModel().select(fileManager.getData().getMode());
+
+
+                    //Keysize
+                    ks.getItems().clear();
+                    settingsManager.addSubelements("algorithm", algoid, "keysize", "keyid", ks);
+                    int index = 0;
+                    index = settingsManager.getIndex("keysize", fileManager.getData().getKeysize());
+                    ks.getSelectionModel().select(index);
+
+                }
+            });
+
+
+            //Mode initial
+            System.out.println("else");
+            int modid = cbm.getSelectionModel().getSelectedIndex();
+            System.out.println("ModeID: "+modid);
+            cbp.getItems().clear();
+            if(modid != -1) {
+                settingsManager.addSubelements("mode", modid, "padding", "paddingid", cbp);
+            }
+            cbp.getSelectionModel().select(fileManager.getData().getPad());
+
+            //Mode Listener
+            cbm.valueProperty().addListener((obs, oldValue, newValue) -> {
+                if (newValue == null) {
+                    System.out.println("if");
+                    System.out.println(cbm.getItems().isEmpty());
+                    if(cbm.getItems().isEmpty()) {
+                        cbp.getItems().clear();
+                    }
+
+                } else {
+                    System.out.println("else");
+                    int modeid = cbm.getSelectionModel().getSelectedIndex();
+                    System.out.println("ModeID: "+modeid);
+                    cbp.getItems().clear();
+                    settingsManager.addSubelements("mode", modeid, "padding", "paddingid",cbp);
+                    cbp.getSelectionModel().select(fileManager.getData().getPad());
+                }
+            });
+
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
         //Set the new Scene on the Stage
         stage.setScene(scene);
+
+        stage.show();
+
+
     }
 
     /**
@@ -64,16 +246,38 @@ public class FXMLController {
      * @throws IOException
      */
     @FXML
-    protected void handleBackButtonAction(ActionEvent event) throws IOException {
-        System.out.println("Back");
-        //Load fxml file in Parent root
-        Parent root = FXMLLoader.load(getClass().getResource("editor.fxml"));
-        //Get current Stage
-        Stage stage = (Stage) back.getScene().getWindow();
-        //Create Scene with root element
-        Scene scene = new Scene(root);
-        //Set the new Scene on the Stage
-        stage.setScene(scene);
+    protected void handleApplyButtonAction(ActionEvent event) throws IOException {
+        System.out.println("Apply");
+
+        fileManager.getData().setPbe(cbpbe.isSelected());
+        System.out.println("PBE: "+fileManager.getData().pbe);
+        fileManager.getData().setPassword(pfpbe.getText());
+        System.out.println("PASSWORD: "+fileManager.getData().password);
+        fileManager.getData().setAlgo(settingsManager.getIndex("algorithm", cbalgo.getSelectionModel().getSelectedItem().toString()));
+        System.out.println("ALGO: "+fileManager.getData().algo);
+        if(!keysize.getItems().isEmpty()){
+            System.out.println("KEYSIZE: "+Integer.parseInt(keysize.getSelectionModel().getSelectedItem().toString()));
+            fileManager.getData().setKeysize(Integer.parseInt(keysize.getSelectionModel().getSelectedItem().toString()));
+        }else {
+            fileManager.getData().setKeysize(0);
+        }
+        int algoid = settingsManager.getIndex("algorithm", cbalgo.getSelectionModel().getSelectedItem().toString());
+        fileManager.getData().setBlocksize(settingsManager.getBlocksize("algorithm", algoid));
+        if(!cbmode.getItems().isEmpty()) {
+            fileManager.getData().setMode(settingsManager.getIndex("mode", cbmode.getSelectionModel().getSelectedItem().toString()));
+        } else {
+            fileManager.getData().setMode(-1);
+        }
+        System.out.println("MODE: "+fileManager.getData().mode);
+        if(!cbpad.getItems().isEmpty()) {
+            fileManager.getData().setPad(settingsManager.getIndex("padding", cbpad.getSelectionModel().getSelectedItem().toString()));
+        }else {
+            fileManager.getData().setPad(-1);
+        }
+        System.out.println("PAD: "+fileManager.getData().pad);
+        Stage stage = (Stage) apply.getScene().getWindow();
+        stage.close();
+
     }
 
     /**
@@ -82,11 +286,11 @@ public class FXMLController {
      * @throws IOException
      */
     @FXML
-    protected void handleNewFileButtonAction(ActionEvent event) throws IOException {
+    protected void handleNewFileButtonAction(ActionEvent event) throws IOException, SAXException {
         System.out.println("New File");
         //Set boolean nFile true
-        manager.setPath(null);
-        manager.setFileName(null);
+        fileManager.setPath(null);
+        fileManager.setFileName(null);
         //Load fxml file in Parent root
         Parent root = FXMLLoader.load(getClass().getResource("editor.fxml"));
         //Get current Stage
@@ -99,8 +303,45 @@ public class FXMLController {
         txta.setText("");
         //Set the new Scene on the Stage
         stage.setScene(scene);
+
     }
 
+    /**
+     * ActionEvent NewKeyFile Button
+     * @param event
+     * @throws IOException
+     */
+    @FXML
+    protected void handleNewKeyFileButtonAction(ActionEvent event) throws IOException, SAXException {
+        System.out.println("New Key File");
+        //Set boolean nFile true
+
+        //Creating FileChooser
+        FileChooser chooser = new FileChooser();
+        //Filter only Txt Files
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("XML Files", "*.xml"));
+        //Show Save Dialog
+        File f = chooser.showSaveDialog(nkFile.getScene().getWindow());
+        if (f != null) {
+            //Save fileName
+            fileManager.setKeyFileName(f.getName());
+            System.out.println(f.getName());
+
+            //Save currentPath
+            fileManager.setKeyPath(f.getPath());
+            System.out.println(f.getPath());
+
+            try {
+                //Save Document in Path
+                String text= "hallo"; // fileManager.getKeyFileText();
+                System.out.println(text);
+                fileManager.saveKeyText(text);
+            } catch (Exception ex) {
+                System.out.println(ex.getMessage());
+            }
+        }
+
+    }
 
     /**
      * ActionEvent Normal Open Button
@@ -124,9 +365,9 @@ public class FXMLController {
             if(pos != -1) {
                 filename = f.getName().substring(0, pos);
             }
-            manager.setFileName(filename);
+            fileManager.setFileName(filename);
             //Save CurrentPath of file
-            manager.setPath(f.getPath());
+            fileManager.setPath(f.getPath());
             //Load fxml file in Parent root
             Parent root = FXMLLoader.load(getClass().getResource("editor.fxml"));
             //Get current Stage
@@ -136,7 +377,7 @@ public class FXMLController {
             //Get textArea from editor scene and load Content in text Area
             Node node = scene.lookup("#textArea");
             TextArea txta = (TextArea) node;
-            txta.setText(manager.loadText(f));
+            txta.setText(fileManager.loadText(f));
             //Set the new Scene on the Stage
             stage.setScene(scene);
         }
@@ -152,7 +393,7 @@ public class FXMLController {
     protected void handleSaveButtonAction(ActionEvent event) throws IOException {
         System.out.println("Save");
         //If there is no currentPath
-        if(manager.getPath()== null) {
+        if(fileManager.getPath()== null) {
             //Creating FileChooser
             FileChooser chooser = new FileChooser();
             //Filter only Txt Files
@@ -162,19 +403,19 @@ public class FXMLController {
             //If file is saved
             if (f != null) {
                 //Save fileName
-                manager.setFileName(f.getName());
+                fileManager.setFileName(f.getName());
                 //Save currentPath
-                manager.setPath(f.getPath());
+                fileManager.setPath(f.getPath());
                 try {
                     //Save Document in Path
-                    manager.saveText(textArea.getText());
+                    fileManager.saveText(textArea.getText());
                 } catch (IOException ex) {
                     System.out.println(ex.getMessage());
                 }
             }
         }else{
             //Save Document in Path
-            manager.saveText(textArea.getText());
+            fileManager.saveText(textArea.getText());
         }
     }
 
@@ -187,20 +428,20 @@ public class FXMLController {
     @FXML
     protected void handleSaveAsButtonAction(ActionEvent event) throws IOException {
         System.out.println("Save as ...");
-        manager.setPath(null);
-        manager.setFileName(null);
+        fileManager.setPath(null);
+        fileManager.setFileName(null);
         handleSaveButtonAction(event);
     }
 
 
     /**
-     * ActionEvent AES Open Button
+     * ActionEvent DEC Button
      * @param event
      * @throws IOException
      */
     @FXML
-    protected void handleAESOpenButtonAction(ActionEvent event) throws IOException {
-        System.out.println("Open AES");
+    protected void handleDECButtonAction(ActionEvent event) throws IOException {
+        System.out.println("Open DEC");
         //Creating FileChooser
         FileChooser chooser = new FileChooser();
         //Filter only Txt Files
@@ -215,9 +456,9 @@ public class FXMLController {
             if(pos != -1) {
                 filename = f.getName().substring(0, pos);
             }
-            manager.setFileName(filename);
+            fileManager.setFileName(filename);
             //Save CurrentPath of file
-            manager.setPath(f.getPath());
+            fileManager.setPath(f.getPath());
             //Load fxml file in Parent root
             Parent root = FXMLLoader.load(getClass().getResource("editor.fxml"));
             //Get current Stage
@@ -227,7 +468,7 @@ public class FXMLController {
             //Get textArea from editor scene and load Content in text Area
             Node node = scene.lookup("#textArea");
             TextArea txta = (TextArea) node;
-            txta.setText(manager.aesDecryptText(f));
+            txta.setText(fileManager.decryptText(f));
             //Set the new Scene on the Stage
             stage.setScene(scene);
         }
@@ -235,15 +476,15 @@ public class FXMLController {
 
 
     /**
-     * ActionEvent AES Save Button
+     * ActionEvent ENC Save Button
      * @param event
      * @throws IOException
      */
     @FXML
-    protected void handleAESSaveButtonAction(ActionEvent event) throws IOException {
-        System.out.println("AES");
+    protected void handleENCSaveButtonAction(ActionEvent event) throws IOException {
+        System.out.println("ENC");
         //If there is no currentPath
-        if(manager.getPath()== null) {
+        if(fileManager.getPath()== null) {
             //Creating FileChooser
             FileChooser chooser = new FileChooser();
             //Filter only Txt Files
@@ -253,125 +494,39 @@ public class FXMLController {
             //If file is saved
             if (f != null) {
                 //Save fileName
-                manager.setFileName(f.getName());
+                fileManager.setFileName(f.getName());
                 //Save currentPath
-                manager.setPath(f.getPath());
+                fileManager.setPath(f.getPath());
                 try {
                     //Save Document in Path
-                    manager.aesEncryptText(textArea.getText());
+                    fileManager.encryptText(textArea.getText());
                 } catch (IOException ex) {
                     System.out.println(ex.getMessage());
                 }
             }
         }else{
             //Save Document in Path
-            manager.aesEncryptText(textArea.getText());
+            fileManager.encryptText(textArea.getText());
         }
     }
 
 
     /**
-     * ActionEvent AES SaveAs Button
+     * ActionEvent ENC SaveAs Button
      * @param event
      * @throws IOException
      */
     @FXML
-    protected void handleAESSaveAsButtonAction(ActionEvent event) throws IOException {
-        System.out.println("Save as ...");
-        manager.setPath(null);
-        manager.setFileName(null);
-        handleAESSaveButtonAction(event);
+    protected void handleENCSaveAsButtonAction(ActionEvent event) throws IOException {
+        System.out.println("ENC Save as ...");
+        fileManager.setPath(null);
+        fileManager.setFileName(null);
+        handleENCSaveButtonAction(event);
     }
 
 
-    /**
-     * ActionEvent DES Open Button
-     * @param event
-     * @throws IOException
-     */
-    @FXML
-    protected void handleDESOpenButtonAction(ActionEvent event) throws IOException {
-        System.out.println("Open DES");
-        //Creating FileChooser
-        FileChooser chooser = new FileChooser();
-        //Filter only Txt Files
-        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text Files", "*.txt"));
-        //Show Open Dialog
-        File f = chooser.showOpenDialog(mbopen.getScene().getWindow());
-        //Check if an Document was found
-        if (f != null) {
-            //Read filename into String and Set it
-            String filename = null;
-            int pos = f.getName().lastIndexOf(".");
-            if(pos != -1) {
-                filename = f.getName().substring(0, pos);
-            }
-            manager.setFileName(filename);
-            //Save CurrentPath of file
-            manager.setPath(f.getPath());
-            //Load fxml file in Parent root
-            Parent root = FXMLLoader.load(getClass().getResource("editor.fxml"));
-            //Get current Stage
-            Stage stage = (Stage) mbopen.getScene().getWindow();
-            //Create Scene with root element
-            Scene scene = new Scene(root);
-            //Get textArea from editor scene and load Content in text Area
-            Node node = scene.lookup("#textArea");
-            TextArea txta = (TextArea) node;
-            txta.setText(manager.desDecryptText(f));
-            //Set the new Scene on the Stage
-            stage.setScene(scene);
-        }
-    }
 
 
-    /**
-     * ActionEvent DES Save Button
-     * @param event
-     * @throws IOException
-     */
-    @FXML
-    protected void handleDESSaveButtonAction(ActionEvent event) throws IOException {
-        System.out.println("DES");
-        //If there is no currentPath
-        if(manager.getPath()== null) {
-            //Creating FileChooser
-            FileChooser chooser = new FileChooser();
-            //Filter only Txt Files
-            chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Text Files", "*.txt"));
-            //Show Save Dialog
-            File f = chooser.showSaveDialog(mbsave.getScene().getWindow());
-            //If file is saved
-            if (f != null) {
-                //Save fileName
-                manager.setFileName(f.getName());
-                //Save currentPath
-                manager.setPath(f.getPath());
-                try {
-                    //Save Document in Path
-                    manager.desEncryptText(textArea.getText());
-                } catch (IOException ex) {
-                    System.out.println(ex.getMessage());
-                }
-            }
-        }else{
-            //Save Document in Path
-            manager.desEncryptText(textArea.getText());
-        }
-    }
 
-
-    /**
-     * ActionEvent DES SaveAs Button
-     * @param event
-     * @throws IOException
-     */
-    @FXML
-    protected void handleDESSaveAsButtonAction(ActionEvent event) throws IOException {
-        System.out.println("Save as ...");
-        manager.setPath(null);
-        manager.setFileName(null);
-        handleDESSaveButtonAction(event);
-    }
 
 }
