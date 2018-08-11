@@ -49,6 +49,10 @@ public class FileManager {
     String currentKeyPath;
     String tempKeyName;
 
+    char[] password;
+
+
+
     /**
      * Constructor
      */
@@ -209,14 +213,24 @@ public class FileManager {
 
                 if(data.getPbe()==true) {
 
+                    count = settingsManager.getIterationcount(currentKeyPath);
+                    data.setIterationCount(count);
+                    System.out.println("HIER0 KEY: "+ Arrays.toString(password));
+                    settingsManager.setPassword(password, currentKeyPath);
+                    count++;
+                    System.out.println("COunt ENC: "+count);
+                    settingsManager.setIterationcount(count, currentKeyPath);
+
                     cipher = Cipher.getInstance(algorithm, "BC");
 
-                    char[] password = data.getPassword().toCharArray();
+                    //password = data.getPassword().toCharArray();
+                    System.out.println("USED PASSWORD: "+Arrays.toString(password));
                     byte[] salt = data.getSalt();
                     int iterationCount = data.getIterationCount();
                     System.out.println(iterationCount);
 
-                    PBEKeySpec pbeSpec = new PBEKeySpec(password, salt, iterationCount);
+                    System.out.println("ITERATIONCOUNT: "+data.getIterationCount());
+                    PBEKeySpec pbeSpec = new PBEKeySpec(password, salt, iterationCount+213);
                     SecretKeyFactory keyFact = SecretKeyFactory.getInstance(algorithm, "BC");
 
                     cipher = Cipher.getInstance(algorithm, "BC");
@@ -248,6 +262,8 @@ public class FileManager {
 
                     }
 
+                    setPassword("");
+
 
                 } else {
                     //Modes vorhanden?
@@ -269,9 +285,13 @@ public class FileManager {
 
                     data.encryptionKey = encryptionKey;
 
-                    count = settingsManager.getIterationcount();
+                    count = settingsManager.getIterationcount(currentKeyPath);
+                    data.setIterationCount(count);
                     System.out.println("HIER0 KEY: "+ Utils.toHex(Base64.encode(encryptionKey.getEncoded())));
-                    settingsManager.setKey(Base64.encode(encryptionKey.getEncoded()));
+                    settingsManager.setKey(Base64.encode(encryptionKey.getEncoded()), currentKeyPath);
+                    count++;
+                    System.out.println("COunt ENC: "+count);
+                    settingsManager.setIterationcount(count, currentKeyPath);
 
                     if (iv == true) {
                         byte[] ivBytes = new byte[blocksize];
@@ -308,7 +328,6 @@ public class FileManager {
 
                     }
                 }
-
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -393,43 +412,56 @@ public class FileManager {
             Cipher cipher;
             if(data.getPbe() == true) {
 
-                cipher = Cipher.getInstance(algorithm, "BC");
+                System.out.println("PBE");
+                AlertBox.display("Password", "Please Close");
+                password = AlertBox.password;
 
-                char[] password = data.getPassword().toCharArray();
-                byte[] salt = data.getSalt();
-                int iterationCount = data.getIterationCount();
+                System.out.println("USER PASSWORD: "+Arrays.toString(password));
 
-                PBEKeySpec pbeSpec = new PBEKeySpec(password, salt, iterationCount);
-                SecretKeyFactory keyFact = SecretKeyFactory.getInstance(algorithm, "BC");
-                cipher = Cipher.getInstance(algorithm, "BC");
-                Key sKey = keyFact.generateSecret(pbeSpec);
+                char[] checkPassword = settingsManager.getPassword(data.getIterationCount(), currentKeyPath);
+                System.out.println("Hier 2.Key: "+Arrays.toString(checkPassword));
 
-                IvParameterSpec ivSpec = new IvParameterSpec(data.iv);
+                if(Arrays.toString(password).equals(Arrays.toString(checkPassword))) {
+                    cipher = Cipher.getInstance(algorithm, "BC");
 
-                System.out.println("PASSWORD: "+ Arrays.toString(pbeSpec.getPassword()));
-                cipher.init(Cipher.DECRYPT_MODE, sKey, ivSpec);
+                    //password = data.getPassword().toCharArray();
+                    byte[] salt = data.getSalt();
+                    int iterationCount = data.getIterationCount();
 
-                // decryption pass
-                System.out.println("Decrypt Text: " + text);
-                //Decode text into cipherTextRead input array
-                byte[] cipherText = Base64.decode(text.getBytes());
+                    PBEKeySpec pbeSpec = new PBEKeySpec(password, salt, iterationCount+213);
+                    SecretKeyFactory keyFact = SecretKeyFactory.getInstance(algorithm, "BC");
+                    cipher = Cipher.getInstance(algorithm, "BC");
+                    Key sKey = keyFact.generateSecret(pbeSpec);
 
-                System.out.println("TEST2: "+cipherText.length);
-                byte[] plainText = cipher.doFinal(cipherText);
+                    IvParameterSpec ivSpec = new IvParameterSpec(data.iv);
 
-                //plainText array to String
-                String plainTextString = new String(plainText);
-                System.out.println("Decrypt plainTextString : " + text);
-                text = plainTextString;
-                System.out.println("Decrypt TextString : " + text);
+                    System.out.println("PASSWORD: " + Arrays.toString(pbeSpec.getPassword()));
+                    cipher.init(Cipher.DECRYPT_MODE, sKey, ivSpec);
 
+                    // decryption pass
+                    System.out.println("Decrypt Text: " + text);
+                    //Decode text into cipherTextRead input array
+                    byte[] cipherText = Base64.decode(text.getBytes());
+
+                    System.out.println("TEST2: " + cipherText.length);
+                    byte[] plainText = cipher.doFinal(cipherText);
+
+                    //plainText array to String
+                    String plainTextString = new String(plainText);
+                    System.out.println("Decrypt plainTextString : " + text);
+                    text = plainTextString;
+                    System.out.println("Decrypt TextString : " + text);
+
+                    setPassword("");
+                }else{
+                    System.out.println("WRONG PASSWORD");
+                }
 
             }else {
                 byte [] keyBytes = null;
 
-                byte[] kkey = settingsManager.getKey(count);
-                System.out.println("Hier 2.Key: "+Utils.toHex(kkey));
-                settingsManager.setIterationcount(count++);
+                keyBytes = settingsManager.getKey(data.getIterationCount(), currentKeyPath);
+                System.out.println("Hier 2.Key: "+Utils.toHex(keyBytes));
 
                 Key decryptionKey = new SecretKeySpec(data.encryptionKey.getEncoded(), data.encryptionKey.getAlgorithm());
 
@@ -560,6 +592,11 @@ public class FileManager {
 
     public String getKeyFileName () {
         return tempKeyName;
+    }
+
+    public void setPassword (String pw) {
+        System.out.println(pw);
+        password = pw.toCharArray();
     }
 
 

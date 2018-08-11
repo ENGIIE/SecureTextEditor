@@ -1,5 +1,6 @@
 import chapter2.Utils;
 import javafx.scene.control.ComboBox;
+import org.bouncycastle.util.Arrays;
 import org.bouncycastle.util.encoders.Base64;
 import org.w3c.dom.*;
 
@@ -177,8 +178,8 @@ public class SettingsManager {
 
     }
 
-    public void setKey(byte[] keystring) throws TransformerException {
-        setDocument("./src/main/java/KeyFile.xml");
+    public void setKey(byte[] keystring, String path) throws TransformerException {
+        setDocument(path);
 
         Node keylist = document.getElementsByTagName("keylist").item(0);
 
@@ -192,7 +193,7 @@ public class SettingsManager {
             DOMSource domSource = new DOMSource(document);
             Transformer transformer = null;
             transformer = transformerFactory.newTransformer();
-            StreamResult streamResult = new StreamResult(new File("./src/main/java/KeyFile.xml"));
+            StreamResult streamResult = new StreamResult(new File(path));
             transformer.transform(domSource, streamResult);
             System.out.println("DONE");
         } catch (Exception e) {
@@ -203,8 +204,8 @@ public class SettingsManager {
         setDocument("./src/main/java/Settingsdata.xml");
     }
 
-    public byte[] getKey(int count){
-        setDocument("./src/main/java/KeyFile.xml");
+    public byte[] getKey(int count, String path){
+        setDocument(path);
         byte[] key= null;
 
         NodeList keylist = document.getElementsByTagName("key");
@@ -218,11 +219,56 @@ public class SettingsManager {
 
     }
 
-    public void setIterationcount(int count){
-        setDocument("./src/main/java/KeyFile.xml");
+    public void setPassword(char[] pwstring, String path) throws TransformerException {
+        setDocument(path);
+
+        String pw = new String(pwstring);
+        Node keylist = document.getElementsByTagName("keylist").item(0);
+
+        Element key = document.createElement("key");
+        key.appendChild(document.createTextNode(pw));
+        System.out.println("SAVED PW: "+ pw);
+        keylist.appendChild(key);
+
+
+        try {
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            DOMSource domSource = new DOMSource(document);
+            Transformer transformer = null;
+            transformer = transformerFactory.newTransformer();
+            StreamResult streamResult = new StreamResult(new File(path));
+            transformer.transform(domSource, streamResult);
+            System.out.println("DONE");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        setDocument("./src/main/java/Settingsdata.xml");
+    }
+
+    public char[] getPassword(int count, String path){
+        setDocument(path);
+        char[] password= null;
+
+        NodeList keylist = document.getElementsByTagName("key");
+        password = keylist.item(count).getTextContent().toCharArray();
+        String pw = new String (password);
+        System.out.println("HIER1: "+ pw);
+
+
+        setDocument("./src/main/java/Settingsdata.xml");
+
+        return password;
+
+    }
+
+    public void setIterationcount(int count, String path){
+        setDocument(path);
 
         Node icList = document.getElementsByTagName("iterationcount").item(0);
 
+        System.out.println("COUNT: "+count);
         icList.setTextContent(String.valueOf(count));
 
         try {
@@ -230,9 +276,10 @@ public class SettingsManager {
             DOMSource domSource = new DOMSource(document);
             Transformer transformer = null;
             transformer = transformerFactory.newTransformer();
-            StreamResult streamResult = new StreamResult(new File("./src/main/java/KeyFile.xml"));
+            StreamResult streamResult = new StreamResult(new File(path));
             transformer.transform(domSource, streamResult);
             System.out.println("DONE");
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -240,8 +287,8 @@ public class SettingsManager {
         setDocument("./src/main/java/Settingsdata.xml");
     }
 
-    public int getIterationcount(){
-        setDocument("./src/main/java/KeyFile.xml");
+    public int getIterationcount(String path){
+        setDocument(path);
         int count;
 
         NodeList icList = document.getElementsByTagName("iterationcount");
@@ -252,6 +299,10 @@ public class SettingsManager {
         setDocument("./src/main/java/Settingsdata.xml");
 
         return count;
+
+    }
+
+    public  void setKeyDocument (String path){
 
     }
 
