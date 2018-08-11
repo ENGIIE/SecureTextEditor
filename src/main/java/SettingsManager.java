@@ -1,6 +1,9 @@
+import chapter2.Utils;
 import javafx.scene.control.ComboBox;
+import org.bouncycastle.util.encoders.Base64;
 import org.w3c.dom.*;
 
+import javax.rmi.CORBA.Util;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
@@ -180,7 +183,7 @@ public class SettingsManager {
         Node keylist = document.getElementsByTagName("keylist").item(0);
 
         Element key = document.createElement("key");
-        key.appendChild(document.createTextNode(keystring.toString()));
+        key.appendChild(document.createTextNode(Base64.toBase64String(keystring)));
         keylist.appendChild(key);
 
 
@@ -205,9 +208,8 @@ public class SettingsManager {
         byte[] key= null;
 
         NodeList keylist = document.getElementsByTagName("key");
-        System.out.println(keylist.item(0).getTextContent());
-        key = keylist.item(count).getTextContent().getBytes();
-        System.out.println(keylist.item(count).getTextContent());
+        key = Base64.decode(keylist.item(count).getTextContent().getBytes());
+        System.out.println("HIER1: "+Utils.toHex(key));
 
 
         setDocument("./src/main/java/Settingsdata.xml");

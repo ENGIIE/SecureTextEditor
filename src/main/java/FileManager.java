@@ -270,8 +270,8 @@ public class FileManager {
                     data.encryptionKey = encryptionKey;
 
                     count = settingsManager.getIterationcount();
-                    System.out.println("HIER KEY: "+ encryptionKey.getEncoded());
-                    settingsManager.setKey(encryptionKey.getEncoded());
+                    System.out.println("HIER0 KEY: "+ Utils.toHex(Base64.encode(encryptionKey.getEncoded())));
+                    settingsManager.setKey(Base64.encode(encryptionKey.getEncoded()));
 
                     if (iv == true) {
                         byte[] ivBytes = new byte[blocksize];
@@ -428,8 +428,8 @@ public class FileManager {
                 byte [] keyBytes = null;
 
                 byte[] kkey = settingsManager.getKey(count);
-                System.out.println("Hier 2.Key: "+kkey.toString());
-                settingsManager.setIterationcount(1);
+                System.out.println("Hier 2.Key: "+Utils.toHex(kkey));
+                settingsManager.setIterationcount(count++);
 
                 Key decryptionKey = new SecretKeySpec(data.encryptionKey.getEncoded(), data.encryptionKey.getAlgorithm());
 

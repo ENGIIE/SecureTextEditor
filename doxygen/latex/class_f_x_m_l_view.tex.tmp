@@ -1,0 +1,27 @@
+\hypertarget{class_f_x_m_l_view}{}\section{F\+X\+M\+L\+View Class Reference}
+\label{class_f_x_m_l_view}\index{F\+X\+M\+L\+View@{F\+X\+M\+L\+View}}
+
+
+Inheritance diagram for F\+X\+M\+L\+View\+:
+% FIG 0
+
+
+Collaboration diagram for F\+X\+M\+L\+View\+:
+% FIG 1
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_f_x_m_l_view_aebc78a644198a26544474f04f00982f4}\label{class_f_x_m_l_view_aebc78a644198a26544474f04f00982f4}} 
+void {\bfseries start} (final Stage primary\+Stage)  throws I\+O\+Exception 
+\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{class_f_x_m_l_view_abd33ffd5c74441aeeee6aa2f05c95fbc}\label{class_f_x_m_l_view_abd33ffd5c74441aeeee6aa2f05c95fbc}} 
+static void {\bfseries main} (String\mbox{[}$\,$\mbox{]} args)
+\end{DoxyCompactItemize}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/nnamf/\+Idea\+Projects/\+Secure\+Text\+Editor/src/main/java/F\+X\+M\+L\+View.\+java\end{DoxyCompactItemize}
