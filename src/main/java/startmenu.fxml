@@ -35,13 +35,17 @@
             <MenuButton fx:id="mbopen" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" mnemonicParsing="false" prefHeight="30.0" prefWidth="240.0" text="Open" textAlignment="CENTER">
                <items>
                   <MenuItem fx:id="miopen" mnemonicParsing="false" onAction="#handleOpenButtonAction" text="Normal" />
-                  <MenuItem fx:id="miopenaes" mnemonicParsing="false" onAction="#handleAESOpenButtonAction" text="AES" />
-                  <MenuItem fx:id="miopendes" mnemonicParsing="false" onAction="#handleDESOpenButtonAction" text="DES" />
+                  <MenuItem fx:id="midecrypt" mnemonicParsing="false" onAction="#handleDECButtonAction" text="Decrypt" />
                </items>
                <font>
                   <Font name="Calibri Light" size="15.0" />
                </font>
             </MenuButton>
+            <Button fx:id="nkFile" layoutX="145.0" layoutY="255.0" mnemonicParsing="false" onAction="#handleNewKeyFileButtonAction" prefHeight="30.0" prefWidth="240.0" text="New Key File">
+               <font>
+                  <Font name="Calibri Light" size="15.0" />
+               </font>
+            </Button>
          </children>
       </VBox>
    </children>

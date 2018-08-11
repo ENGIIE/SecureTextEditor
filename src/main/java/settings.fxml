@@ -2,9 +2,10 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.RadioButton?>
-<?import javafx.scene.control.ToggleGroup?>
+<?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -13,6 +14,24 @@
    <children>
       <VBox alignment="CENTER" layoutX="1.0" layoutY="1.0" prefHeight="600.0" prefWidth="600.0">
          <children>
+            <CheckBox fx:id="cbpbe" mnemonicParsing="false" text="Password-Based Encryption">
+               <font>
+                  <Font name="Calibri Light" size="15.0" />
+               </font>
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </CheckBox>
+            <Label text="Password">
+               <font>
+                  <Font name="Calibri Light" size="15.0" />
+               </font>
+            </Label>
+            <PasswordField fx:id="pfpbe" maxWidth="150.0" prefWidth="150.0">
+               <VBox.margin>
+                  <Insets bottom="10.0" />
+               </VBox.margin>
+            </PasswordField>
             <Label alignment="TOP_LEFT" text="Algorithm">
                <font>
                   <Font name="Calibri Light" size="15.0" />
@@ -20,75 +39,26 @@
                <VBox.margin>
                   <Insets left="5.0" right="5.0" top="5.0" />
                </VBox.margin></Label>
-            <VBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="50.0">
-               <children>
-                  <RadioButton mnemonicParsing="false" text="AES">
-                     <toggleGroup>
-                        <ToggleGroup fx:id="algorithm" />
-                     </toggleGroup>
-                  </RadioButton>
-                  <RadioButton mnemonicParsing="false" text="DES" toggleGroup="$algorithm" />
-               </children>
-               <padding>
-                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-               </padding>
-               <VBox.margin>
-                  <Insets />
-               </VBox.margin>
-            </VBox>
+            <ComboBox fx:id="cbalgo" prefWidth="150.0" />
+            <Label text="Keysize">
+               <font>
+                  <Font name="Calibri Light" size="15.0" />
+               </font>
+            </Label>
+            <ComboBox fx:id="keysize" prefWidth="150.0" />
             <Label alignment="TOP_LEFT" text="Mode">
                <font>
                   <Font name="Calibri Light" size="15.0" />
                </font>
             </Label>
-            <VBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="50.0">
-               <children>
-                  <RadioButton mnemonicParsing="false" text="ECB">
-                     <toggleGroup>
-                        <ToggleGroup fx:id="mode" />
-                     </toggleGroup>
-                  </RadioButton>
-                  <RadioButton mnemonicParsing="false" text="CBC" toggleGroup="$mode" />
-                  <RadioButton mnemonicParsing="false" text="CTS" toggleGroup="$mode" />
-                  <RadioButton mnemonicParsing="false" text="CTR" toggleGroup="$mode" />
-                  <RadioButton mnemonicParsing="false" text="OFB" toggleGroup="$mode" />
-                  <RadioButton mnemonicParsing="false" text="CFB" toggleGroup="$mode" />
-               </children>
-               <opaqueInsets>
-                  <Insets bottom="20.0" left="50.0" right="50.0" top="20.0" />
-               </opaqueInsets>
-               <padding>
-                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-               </padding>
-               <VBox.margin>
-                  <Insets />
-               </VBox.margin>
-            </VBox>
+            <ComboBox fx:id="cbmode" prefWidth="150.0" />
             <Label alignment="TOP_LEFT" text="Padding">
                <font>
                   <Font name="Calibri Light" size="15.0" />
                </font>
             </Label>
-            <VBox prefHeight="100.0" prefWidth="50.0">
-               <children>
-                  <RadioButton mnemonicParsing="false" text="NoPadding">
-                     <toggleGroup>
-                        <ToggleGroup fx:id="padding" />
-                     </toggleGroup>
-                  </RadioButton>
-                  <RadioButton mnemonicParsing="false" text="PKCS#5" toggleGroup="$padding" />
-                  <RadioButton mnemonicParsing="false" text="PKCS#7" toggleGroup="$padding" />
-                  <RadioButton mnemonicParsing="false" text="ISO10126-2" toggleGroup="$padding" />
-                  <RadioButton mnemonicParsing="false" text="ISO7816-4" toggleGroup="$padding" />
-                  <RadioButton mnemonicParsing="false" text="X9.23" toggleGroup="$padding" />
-                  <RadioButton mnemonicParsing="false" text="TBC" toggleGroup="$padding" />
-                  <RadioButton mnemonicParsing="false" text="Zero Byte" toggleGroup="$padding" />
-               </children>
-               <padding>
-                  <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-               </padding>
-            </VBox>
-            <Button fx:id="back" mnemonicParsing="false" onAction="#handleBackButtonAction" prefHeight="30.0" prefWidth="90.0" text="Back">
+            <ComboBox fx:id="cbpad" prefWidth="150.0" />
+            <Button fx:id="apply" mnemonicParsing="false" onAction="#handleApplyButtonAction" prefHeight="30.0" prefWidth="90.0" text="Apply">
                <font>
                   <Font name="Calibri Light" size="15.0" />
                </font>

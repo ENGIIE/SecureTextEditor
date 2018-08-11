@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<settingsdata>
+    <algorithms>
+        <algorithm id="0">
+            <name>AES</name>
+            <pbe>false</pbe>
+            <keyids>
+                <keyid>0</keyid>
+                <keyid>1</keyid>
+                <keyid>2</keyid>
+            </keyids>
+            <modeids>
+                <modeid>0</modeid>
+                <modeid>1</modeid>
+                <modeid>2</modeid>
+                <modeid>3</modeid>
+                <modeid>4</modeid>
+                <modeid>5</modeid>
+            </modeids>
+            <blocksize>16</blocksize>
+        </algorithm>
+        <algorithm id="1">
+            <name>DES</name>
+            <pbe>false</pbe>
+            <keyids>
+                <keyid>0</keyid>
+            </keyids>
+            <modeids>
+                <modeid>0</modeid>
+                <modeid>1</modeid>
+                <modeid>2</modeid>
+                <modeid>3</modeid>
+                <modeid>4</modeid>
+                <modeid>5</modeid>
+            </modeids>
+            <blocksize>8</blocksize>
+        </algorithm>
+        <algorithm id="2">
+            <name>ARC4</name>
+            <pbe>false</pbe>
+            <keyids>
+                <keyid>0</keyid>
+            </keyids>
+            <modeids>
+            </modeids>
+            <blocksize>8</blocksize>
+        </algorithm>
+        <algorithm id="3">
+            <name>RC4</name>
+            <pbe>false</pbe>
+            <keyids>
+                <keyid>0</keyid>
+            </keyids>
+            <modeids>
+            </modeids>
+            <blocksize>8</blocksize>
+        </algorithm>
+        <algorithm id="4">
+            <name>PBEWithSHAAnd3KeyTripleDES</name>
+            <pbe>true</pbe>
+            <keyids>
+                <keyid>0</keyid>
+            </keyids>
+            <modeids>
+            </modeids>
+            <blocksize>16</blocksize>
+        </algorithm>
+        <algorithm id="5">
+            <name>PBEWithSHA256And128BitAES-CBC-BC</name>
+            <pbe>true</pbe>
+            <keyids>
+                <keyid>0</keyid>
+            </keyids>
+            <modeids>
+            </modeids>
+            <blocksize>16</blocksize>
+        </algorithm>
+        <algorithm id="6">
+            <name>PBEWithMD5AndDES</name>
+            <pbe>true</pbe>
+            <keyids>
+                <keyid>0</keyid>
+            </keyids>
+            <modeids>
+            </modeids>
+            <blocksize>16</blocksize>
+        </algorithm>
+        <algorithm id="7">
+            <name>PBEWithSHAAnd40BitRC</name>
+            <pbe>true</pbe>
+            <keyids>
+                <keyid>0</keyid>
+            </keyids>
+            <modeids>
+            </modeids>
+            <blocksize>16</blocksize>
+        </algorithm>
+    </algorithms>
+    <keysizes>
+        <keysize id="0">128</keysize>
+        <keysize id="1">192</keysize>
+        <keysize id="2">256</keysize>
+    </keysizes>
+    <modes>
+        <mode id="0">
+            <name>ECB</name>
+            <iv>false</iv>
+            <paddingids>
+                <paddingid>0</paddingid>
+                <paddingid>1</paddingid>
+                <paddingid>2</paddingid>
+                <paddingid>3</paddingid>
+                <paddingid>4</paddingid>
+                <paddingid>5</paddingid>
+                <paddingid>6</paddingid>
+                <paddingid>7</paddingid>
+            </paddingids>
+        </mode>
+        <mode id="1">
+            <name>CBC</name>
+            <iv>true</iv>
+            <paddingids>
+                <paddingid>0</paddingid>
+                <paddingid>1</paddingid>
+                <paddingid>2</paddingid>
+                <paddingid>3</paddingid>
+                <paddingid>4</paddingid>
+                <paddingid>5</paddingid>
+                <paddingid>6</paddingid>
+                <paddingid>7</paddingid>
+            </paddingids>
+        </mode>
+        <mode id="2">
+            <name>CTS</name>
+            <iv>true</iv>
+            <paddingids>
+                <paddingid>0</paddingid>
+                <paddingid>1</paddingid>
+                <paddingid>2</paddingid>
+                <paddingid>3</paddingid>
+                <paddingid>4</paddingid>
+                <paddingid>5</paddingid>
+                <paddingid>6</paddingid>
+                <paddingid>7</paddingid>
+            </paddingids>
+        </mode>
+        <mode id="3">
+            <name>CTR</name>
+            <iv>false</iv>
+            <paddingids>
+                <paddingid>0</paddingid>
+            </paddingids>
+        </mode>
+        <mode id="4">
+            <name>OFB</name>
+            <iv>false</iv>
+            <paddingids>
+                <paddingid>0</paddingid>
+            </paddingids>
+        </mode>
+        <mode id="5">
+            <name>CFB</name>
+            <iv>false</iv>
+            <paddingids>
+                <paddingid>0</paddingid>
+            </paddingids>
+        </mode>
+    </modes>
+    <paddings>
+        <padding id="0">
+            <name>NoPadding</name>
+        </padding>
+        <padding id="1">
+            <name>PKCS5Padding</name>
+        </padding>
+        <padding id="2">
+            <name>PKCS7Padding</name>
+        </padding>
+        <padding id="3">
+            <name>ISO10126-2</name>
+        </padding>
+        <padding id="4">
+            <name>ISO7816-4</name>
+        </padding>
+        <padding id="5">
+            <name>X9.23</name>
+        </padding>
+        <padding id="6">
+            <name>TBC</name>
+        </padding>
+        <padding id="7">
+            <name>ZeroByte</name>
+        </padding>
+    </paddings>
+</settingsdata>

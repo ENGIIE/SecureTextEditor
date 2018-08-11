@@ -79,7 +79,9 @@ public class FXMLController {
 
 
         try {
-            Document document = settingsManager.getDocument();
+            settingsManager.setDocument("./src/main/java/Settingsdata.xml");
+            Document document1 = settingsManager.getDocument();
+
 
             //ADD PBE Checkbox
             Node node = scene.lookup("#cbpbe");
@@ -333,7 +335,7 @@ public class FXMLController {
 
             try {
                 //Save Document in Path
-                String text= "hallo"; // fileManager.getKeyFileText();
+                String text= fileManager.getKeyFileText(); // fileManager.getKeyFileText();
                 System.out.println(text);
                 fileManager.saveKeyText(text);
             } catch (Exception ex) {

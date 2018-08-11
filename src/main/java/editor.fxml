@@ -27,8 +27,7 @@
                   <MenuButton fx:id="mbopen" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" layoutX="490.0" layoutY="15.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="90.0" text="Open" textAlignment="CENTER">
                      <items>
                         <MenuItem fx:id="miopen" mnemonicParsing="false" onAction="#handleOpenButtonAction" text="Normal" />
-                        <MenuItem fx:id="miopenaes" mnemonicParsing="false" onAction="#handleAESOpenButtonAction" text="AES" />
-                        <MenuItem fx:id="miopendes" mnemonicParsing="false" onAction="#handleDESOpenButtonAction" text="DES" />
+                        <MenuItem fx:id="midec" mnemonicParsing="false" onAction="#handleDECButtonAction" text="Decrypt" />
                      </items>
                      <font>
                         <Font name="Calibri Light" size="15.0" />
@@ -37,8 +36,7 @@
                   <MenuButton fx:id="mbsave" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" mnemonicParsing="false" prefHeight="30.0" prefWidth="90.0" text="Save" textAlignment="CENTER">
                     <items>
                       <MenuItem fx:id="misave" mnemonicParsing="false" onAction="#handleSaveButtonAction" text="Normal" />
-                      <MenuItem fx:id="miaes" mnemonicParsing="false" onAction="#handleAESSaveButtonAction" text="AES" />
-                        <MenuItem fx:id="mides" mnemonicParsing="false" onAction="#handleDESSaveButtonAction" text="DES" />
+                        <MenuItem fx:id="mienc" mnemonicParsing="false" onAction="#handleENCSaveButtonAction" text="Encrypt" />
                     </items>
                      <font>
                         <Font name="Calibri Light" size="15.0" />
@@ -47,8 +45,7 @@
                   <MenuButton fx:id="mbsaveas" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" mnemonicParsing="false" prefHeight="30.0" prefWidth="120.0" text="Save as ..." textAlignment="CENTER">
                      <items>
                         <MenuItem fx:id="misaveas" mnemonicParsing="false" onAction="#handleSaveAsButtonAction" text="Normal" />
-                        <MenuItem fx:id="miaesas" mnemonicParsing="false" onAction="#handleAESSaveAsButtonAction" text="AES" />
-                        <MenuItem fx:id="midesas" mnemonicParsing="false" onAction="#handleDESSaveAsButtonAction" text="DES" />
+                        <MenuItem fx:id="miencas" mnemonicParsing="false" onAction="#handleENCSaveAsButtonAction" text="Encrypt" />
                      </items>
                      <font>
                         <Font name="Calibri Light" size="15.0" />
