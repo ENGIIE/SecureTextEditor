@@ -39,6 +39,8 @@ public class FXMLController {
     @FXML
     private Button nkFile;
     @FXML
+    private Button okFile;
+    @FXML
     private TextArea textArea;
     @FXML
     private Button apply;
@@ -343,6 +345,51 @@ public class FXMLController {
             }
         }
 
+        //Load fxml file in Parent root
+        Parent root = FXMLLoader.load(getClass().getResource("startmenu.fxml"));
+        //Get current Stage
+        Stage stage = (Stage) nkFile.getScene().getWindow();
+        //Create Scene with root element
+        Scene scene = new Scene(root);
+        //Set the new Scene on the Stage
+        stage.setScene(scene);
+    }
+
+
+    /**
+     * ActionEvent OpenKeyFile Button
+     * @param event
+     * @throws IOException
+     */
+    @FXML
+    protected void handleOpenKeyFileButtonAction(ActionEvent event) throws IOException, SAXException {
+        System.out.println("Open Key File");
+        //Creating FileChooser
+        FileChooser chooser = new FileChooser();
+        //Filter only Txt Files
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("XML Files", "*.xml"));
+        //Show Open Dialog
+        File f = chooser.showOpenDialog(okFile.getScene().getWindow());
+        //Check if an Document was found
+        if (f != null) {
+            //Read filename into String and Set it
+            String filename = null;
+            int pos = f.getName().lastIndexOf(".");
+            if (pos != -1) {
+                filename = f.getName().substring(0, pos);
+            }
+            fileManager.setKeyFileName(filename);
+            //Save CurrentPath of file
+            fileManager.setKeyPath(f.getPath());
+            //Load fxml file in Parent root
+            Parent root = FXMLLoader.load(getClass().getResource("startmenu.fxml"));
+            //Get current Stage
+            Stage stage = (Stage) okFile.getScene().getWindow();
+            //Create Scene with root element
+            Scene scene = new Scene(root);
+            //Set the new Scene on the Stage
+            stage.setScene(scene);
+        }
     }
 
     /**
