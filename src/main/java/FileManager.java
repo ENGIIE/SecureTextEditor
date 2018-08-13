@@ -1,56 +1,47 @@
-import chapter2.Utils;
+import chapter3.Utils;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Base64;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
+import javax.crypto.Mac;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.PBEParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.bind.DatatypeConverter;
 import java.io.*;
-import java.security.Key;
-import java.security.Provider;
-import java.security.SecureRandom;
-import java.security.Security;
+import java.security.*;
 import java.util.Arrays;
 
 public class FileManager {
 
-    int count;
-
     //Cryptography Provider
-    Provider provider;
-
+    private Provider provider;
     //Settingsmanager
-    SettingsManager settingsManager = new SettingsManager();
-
+    private SettingsManager settingsManager = new SettingsManager();
     //Data Object
-    Data data = new Data();
-
+    private Data data = new Data();
     //ScureRandom Object
-    SecureRandom secRndm = new SecureRandom();
-
+    private SecureRandom secRndm = new SecureRandom();
     //FileWriter and FileReader
-    FileWriter fileWriter;
-    FileReader fileReader;
+    private FileWriter fileWriter;
+    private FileReader fileReader;
 
-    //String with the current Path
-    String currentPath;
 
-    //String with the current Name
-    String tempName;
+    //Temporary data
 
-    String currentKeyPath;
-    String tempKeyName;
-
-    char[] password;
-
+    //String with the current File Path
+    private String currentPath;
+    //String with the current File Name
+    private String tempName;
+    //String with the current KeyFile Path
+    private String currentKeyPath;
+    //String with the current KeyFile Name
+    private String tempKeyName;
+    //Alertbox Password
+    private char[] password;
+    //Iterationcount
+    private int count;
 
 
     /**
@@ -127,211 +118,207 @@ public class FileManager {
      */
     public void encryptText (String text) throws IOException {
 
-            try {
+        try {
 
-                System.out.println("Encrypt text: " + text);
+            System.out.println("Encrypt text: " + text);
 
-                //Load the Settingsdata.xml File
-                File settingsfile = new File("./src/main/java/Settingsdata.xml");
-                System.out.println("Settingsdata path: " + settingsfile);
-                DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-                DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-                Document document = documentBuilder.parse(settingsfile);
-
-                //Often used Components
-                NodeList nodeList;
-                org.w3c.dom.Node node;
-                Element element;
-
-                //Get Algorithm, Keysize and Blocksize
-                String algorithm;
-                int keysize = data.getKeysize();
-                int blocksize = data.getBlocksize();
-
-                System.out.println("Algorithm id: " + data.getAlgo());
-                nodeList = document.getElementsByTagName("algorithm");
-                if(data.getAlgo() != -1) {
-                    node = nodeList.item(data.getAlgo());
-                    element = (Element) node;
-                    System.out.println(element.getElementsByTagName("name").item(0).getTextContent());
-                    element.getElementsByTagName("name").item(0).getTextContent();
-                    algorithm = element.getElementsByTagName("name").item(0).getTextContent();
-                }else {
-                    algorithm = "notAvailable";
-                }
-
-                System.out.println("Algorithm: " + algorithm);
-                System.out.println("Keysize: " + keysize);
-                System.out.println("Blocksize: " + blocksize);
-
-                //Get Mode and IV
-                String mode;
-                boolean iv = false;
-
-                nodeList = document.getElementsByTagName("mode");
-                if(data.getMode() != -1) {
-                    node = nodeList.item(data.getMode());
-                    element = (Element) node;
-                    element.getElementsByTagName("name").item(0).getTextContent();
-                    mode = element.getElementsByTagName("name").item(0).getTextContent();
-                    element.getElementsByTagName("iv").item(0).getTextContent();
-                    iv = Boolean.parseBoolean(element.getElementsByTagName("iv").item(0).getTextContent());
-                }else{
-                    mode = "notAvailable";
-                }
-
-                System.out.println("Mode: " + mode);
-                System.out.println("IV: " + iv);
-
-                String padding;
-                if(data.getMode() != -1) {
-                    nodeList = document.getElementsByTagName("padding");
-                    node = nodeList.item(data.getPad());
-                    element = (Element) node;
-                    element.getElementsByTagName("name").item(0).getTextContent();
-                    padding = element.getElementsByTagName("name").item(0).getTextContent();
-                }else{
-                    padding = "notAvailable";
-                }
-
-                System.out.println("Padding: " + padding);
-
-
-
-                //Text into byte array
-                byte[] input = text.getBytes();
-                System.out.println("Encrypt input text : " + Utils.toHex(input));
-                System.out.println("Plain TextString LENGTH: " + input.length);
-                //Creating new SecretKey
-               // SecretKeySpec key = new SecretKeySpec(keyBytes, algorithm);
-                //Instantiate Cipher
-                Cipher cipher;
-
-
-
-                // encryption pass
-
-                if(data.getPbe()==true) {
-
-                    count = settingsManager.getIterationcount(currentKeyPath);
-                    data.setIterationCount(count);
-                    System.out.println("HIER0 KEY: "+ Arrays.toString(password));
-                    settingsManager.setPassword(password, currentKeyPath);
-                    count++;
-                    System.out.println("COunt ENC: "+count);
-                    settingsManager.setIterationcount(count, currentKeyPath);
-
-                    cipher = Cipher.getInstance(algorithm, "BC");
-
-                    //password = data.getPassword().toCharArray();
-                    System.out.println("USED PASSWORD: "+Arrays.toString(password));
-                    byte[] salt = data.getSalt();
-                    int iterationCount = data.getIterationCount();
-                    System.out.println(iterationCount);
-
-                    System.out.println("ITERATIONCOUNT: "+data.getIterationCount());
-                    PBEKeySpec pbeSpec = new PBEKeySpec(password, salt, iterationCount+213);
-                    SecretKeyFactory keyFact = SecretKeyFactory.getInstance(algorithm, "BC");
-
-                    cipher = Cipher.getInstance(algorithm, "BC");
-                    Key sKey = keyFact.generateSecret(pbeSpec);
-
-                    byte[] ivBytes = new byte[8];
-                    secRndm.nextBytes(ivBytes);
-                    data.iv = ivBytes;
-                    IvParameterSpec ivSpec = new IvParameterSpec(ivBytes);
-
-                    System.out.println("PASSWORD: "+ Arrays.toString(pbeSpec.getPassword()));
-                    cipher.init(Cipher.ENCRYPT_MODE, sKey, ivSpec);
-
-                    byte[] cipherText = cipher.doFinal(input);
-                    System.out.println("TEST1: "+cipherText.length);
-
-                    System.out.println("Encrypt cipher text: " + Utils.toHex(cipherText) + " bytes: " + cipherText.length);
-                    String cipherTextString = Base64.toBase64String(cipherText);
-                    System.out.println("Encrypt CipherTextString LENGTH: " + cipherText.length);
-                    System.out.println("Encrypt CipherTextString: " + cipherTextString);
-
-                    data.setCiphertext(cipherTextString);
-
-                    if (currentPath != null) {
-
-                        ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(currentPath));
-                        out.writeObject(data);
-                        out.close();
-
-                    }
-
-                    setPassword("");
-
-
-                } else {
-                    //Modes vorhanden?
-
-                    if(data.mode == -1) {
-                        cipher = Cipher.getInstance(algorithm, "BC");
-                    } else {
-                        cipher = Cipher.getInstance(algorithm + "/" + mode + "/" + padding, "BC");
-                    }
-
-                    //Key
-                    byte[] keyBytes = null;
-
-                    KeyGenerator generator = KeyGenerator.getInstance(algorithm, "BC");
-
-                    generator.init(data.getKeysize());
-
-                    Key encryptionKey = generator.generateKey();
-
-                    data.encryptionKey = encryptionKey;
-
-                    count = settingsManager.getIterationcount(currentKeyPath);
-                    data.setIterationCount(count);
-                    System.out.println("HIER0 KEY: "+ Utils.toHex(Base64.encode(encryptionKey.getEncoded())));
-                    settingsManager.setKey(Base64.encode(encryptionKey.getEncoded()), currentKeyPath);
-                    count++;
-                    System.out.println("COunt ENC: "+count);
-                    settingsManager.setIterationcount(count, currentKeyPath);
-
-                    if (iv == true) {
-                        byte[] ivBytes = new byte[blocksize];
-                        secRndm.nextBytes(ivBytes);
-                        data.iv = ivBytes;
-                        IvParameterSpec ivSpec = new IvParameterSpec(ivBytes);
-                        cipher.init(Cipher.ENCRYPT_MODE, encryptionKey, ivSpec);
-                    } else {
-                        cipher.init(Cipher.ENCRYPT_MODE, encryptionKey);
-                    }
-
-                    //Create cipherText output array
-                    byte[] cipherText = new byte[cipher.getOutputSize(input.length)];
-                    //Block by block encryption from input into cipherText update()
-                    int ctLength = cipher.update(input, 0, input.length, cipherText, 0);
-                    //Get ctLength, doFinal()
-                    ctLength += cipher.doFinal(cipherText, ctLength);
-                    //cipherText to String
-                    //Base64 encoding
-                    System.out.println("Encrypt cipher text: " + Utils.toHex(cipherText) + " bytes: " + ctLength);
-                    String cipherTextString = Base64.toBase64String(cipherText);
-                    System.out.println("Encrypt CipherTextString LENGTH: " + cipherText.length);
-                    System.out.println("Encrypt CipherTextString: " + cipherTextString);
-
-                    data.setCiphertext(cipherTextString);
-
-                    //Writing encrypted text into file
-                    //Current Path has to be available
-                    if (currentPath != null) {
-
-                        ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(currentPath));
-                        out.writeObject(data);
-                        out.close();
-
-                    }
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
+            //Get Algorithm, Keysize and Blocksize
+            String algorithm;
+            int keysize = data.getKeysize();
+            int blocksize = data.getBlocksize();
+            System.out.println("Algorithm id: " + data.getAlgo());
+            if(data.getAlgo() != -1) {
+                algorithm = settingsManager.getElementName("algorithm", data.getAlgo());
+            }else {
+                algorithm = "notAvailable";
             }
+            System.out.println("Algorithm: " + algorithm);
+            System.out.println("Keysize: " + keysize);
+            System.out.println("Blocksize: " + blocksize);
+
+            //Get Mode and IV
+            String mode;
+            boolean iv = false;
+            if(data.getMode() != -1) {
+                mode = settingsManager.getElementName("mode", data.getMode());
+                iv = Boolean.parseBoolean(settingsManager.getSubelement("mode", data.getMode(), "iv"));
+            }else{
+                mode = "notAvailable";
+            }
+            System.out.println("Mode: " + mode);
+            System.out.println("IV: " + iv);
+
+            //Get Padding
+            String padding;
+            if(data.getMode() != -1) {
+                padding = settingsManager.getElementName("padding", data.getPad());
+            }else{
+                padding = "notAvailable";
+            }
+            System.out.println("Padding: " + padding);
+
+            //Get Hashfunction
+            String hashfunct;
+            if(data.getHash() != -1 && data.getHash() != 0) {
+                hashfunct = settingsManager.getElementName("hashfunction", data.getHash());
+            }else{
+                hashfunct = "notAvailable";
+            }
+            System.out.println("Hashfunction: " + hashfunct);
+
+
+            // encryption pass
+
+            //Get Text into input byte array
+            byte[] input = text.getBytes();
+            System.out.println("Encrypt input text : " + Utils.toHex(input));
+            System.out.println("Plain TextString LENGTH: " + input.length);
+
+            //Cipher
+            Cipher cipher;
+
+            //cipher getInstance()
+            if(data.getMode() == -1) {
+                cipher = Cipher.getInstance(algorithm, "BC");
+            } else {
+                cipher = Cipher.getInstance(algorithm + "/" + mode + "/" + padding, "BC");
+            }
+            Mac hMac=null;
+            if(data.getHMAC()){
+                hMac = Mac.getInstance("HMac"+hashfunct, "BC");
+            }
+
+            //IterationCount save
+            count = settingsManager.getIterationcount(currentKeyPath);
+            data.setIterationCount(count);
+            System.out.println("1. ITERATION COUNT: "+count);
+
+            //Generating key + save
+            Key key;
+            Key hMacKey = null;
+            if(data.getPbe()) {
+                System.out.println("USED PASSWORD: "+Arrays.toString(password));
+                byte[] salt = data.getSalt();
+                int iterationCount = data.getIterationCount();
+                //blocksize=8;
+                //Creating key
+                //Key
+                PBEKeySpec pbeSpec = new PBEKeySpec(password, salt, iterationCount+213);
+                System.out.println("PASSWORD: "+ Arrays.toString(pbeSpec.getPassword()));
+                SecretKeyFactory keyFact = SecretKeyFactory.getInstance(algorithm, "BC");
+                key = keyFact.generateSecret(pbeSpec);
+                if(data.getHMAC()){
+                    hMacKey = new SecretKeySpec(key.getEncoded(), "HMac"+algorithm);
+                    settingsManager.setKey(Base64.encode(hMacKey.getEncoded()), currentKeyPath);
+                }else {
+                    settingsManager.setPassword(password, currentKeyPath);
+                }
+                count++;
+                System.out.println("2. ITERATION COUNT: " + count);
+                settingsManager.setIterationcount(count, currentKeyPath);
+                setPassword("");
+            }else {
+                //Creating key
+                //Key
+                byte[] keyBytes = null;
+                KeyGenerator generator = KeyGenerator.getInstance(algorithm, "BC");
+                System.out.println("KEYSIZE: "+data.getKeysize());
+                generator.init(data.getKeysize());
+                key = generator.generateKey();
+                settingsManager.setKey(Base64.encode(key.getEncoded()), currentKeyPath);
+                if(data.getHMAC()){
+                    hMacKey = new SecretKeySpec(key.getEncoded(), "HMac"+hashfunct);
+                    settingsManager.setKey(Base64.encode(hMacKey.getEncoded()), currentKeyPath);
+                } else {
+                    settingsManager.setKey(Base64.encode(key.getEncoded()), currentKeyPath);
+                }
+                System.out.println("KEY ENC: "+Utils.toHex(settingsManager.getKey(data.getIterationCount(), currentKeyPath)));
+                System.out.println(Utils.toHex(settingsManager.getKey(data.getIterationCount(), currentKeyPath)).length());
+                count++;
+                System.out.println("2. ITERATION COUNT " + count);
+                settingsManager.setIterationcount(count, currentKeyPath);
+            }
+
+            //Creating iv + cipher.init()
+            if (iv | data.getPbe()) {
+                byte[] ivBytes = new byte[blocksize];
+                secRndm.nextBytes(ivBytes);
+                data.setIv(ivBytes);
+                System.out.println("IV: "+data.getIv());
+                IvParameterSpec ivSpec = new IvParameterSpec(ivBytes);
+                cipher.init(Cipher.ENCRYPT_MODE, key, ivSpec);
+            } else {
+                cipher.init(Cipher.ENCRYPT_MODE, key);
+            }
+
+            //cipherText + ctLength update()+doFinal()
+            byte[] cipherText;
+            if(data.getPbe()){
+                cipherText = cipher.doFinal(input);
+            }
+            int ctLength;
+
+            //Message Digest
+            if(hashfunct != "notAvailable"){
+                if(data.getHMAC()){
+                    cipherText = new byte[cipher.getOutputSize(text.length() + hMac.getMacLength())];
+
+                    ctLength = cipher.update(Utils.toByteArray(text), 0, text.length(), cipherText, 0);
+
+                    hMac.init(hMacKey);
+                    hMac.update(Utils.toByteArray(text));
+
+                    ctLength += cipher.doFinal(hMac.doFinal(), 0, hMac.getMacLength(), cipherText, ctLength);
+
+                    // tampering step
+                    //cipherText[9] ^= '0' ^ '9';
+                    byte[] digest = hMac.doFinal();
+                    settingsManager.setHash(DatatypeConverter.printHexBinary(digest).toUpperCase(), currentKeyPath);
+                }else {
+                    MessageDigest hash = MessageDigest.getInstance(hashfunct, "BC");
+                    cipherText = new byte[cipher.getOutputSize(input.length + hash.getDigestLength())];
+                    //Block by block encryption from input into cipherText update()
+                    ctLength = cipher.update(input, 0, input.length, cipherText, 0);
+                    hash.update(input);
+                    //Get ctLength, doFinal()
+                    ctLength += cipher.doFinal(hash.digest(), 0, hash.getDigestLength(), cipherText, ctLength);
+                    //tampering
+                    //cipherText[9] ^= '0' ^ '9';
+                    byte[] digest = hash.digest();
+                    settingsManager.setHash(DatatypeConverter.printHexBinary(digest).toUpperCase(), currentKeyPath);
+                }
+
+            }else{
+                cipherText = new byte[cipher.getOutputSize(input.length)];
+                //Block by block encryption from input into cipherText update()
+                ctLength = cipher.update(input, 0, input.length, cipherText, 0);
+                //Get ctLength, doFinal()
+                ctLength += cipher.doFinal(cipherText, ctLength);
+                settingsManager.setHash("0", currentKeyPath);
+            }
+
+            //cipherText to String
+            //Base64 encoding
+            System.out.println("Encrypt cipher text: " + Utils.toHex(cipherText) + " bytes: " + ctLength);
+            String cipherTextString = Base64.toBase64String(cipherText);
+            System.out.println("Encrypt CipherTextString LENGTH: " + cipherText.length);
+            System.out.println("Encrypt CipherTextString: " + cipherTextString);
+            data.setCiphertext(cipherTextString);
+
+
+            //Writing encrypted text into file
+            //Current Path has to be available
+            if (currentPath != null) {
+
+                ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(currentPath));
+                out.writeObject(data);
+                out.close();
+
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
     }
 
@@ -346,164 +333,214 @@ public class FileManager {
         //Current Text
         String text = "";
         try {
-
+            //Ciphertxt
             ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
             data = (Data) in.readObject();
             in.close();
             text = data.getCiphertext();
 
-
-            File settingsfile = new File("./src/main/java/Settingsdata.xml");
-            System.out.println(settingsfile);
-            DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
-            Document document = documentBuilder.parse(settingsfile);
-
-            NodeList nList = document.getElementsByTagName("algorithm");
-            org.w3c.dom.Node node = nList.item(data.getAlgo());
-            Element eElement = (Element) node;
-            eElement.getElementsByTagName("name").item(0).getTextContent();
-            String algorithm = eElement.getElementsByTagName("name").item(0).getTextContent();
-            if(eElement.getElementsByTagName("keysize").getLength() != 0) {
-                eElement.getElementsByTagName("keysize").item(0).getTextContent();
-                if (eElement.getElementsByTagName("keysize").item(0).getTextContent() != null) {
-                    int keysize = Integer.parseInt(eElement.getElementsByTagName("keysize").item(0).getTextContent());
-                    System.out.println("Keysize: " + keysize);
-                } else {
-                    int keysize = 0;
-                    System.out.println("Keysize: " + keysize);
-                }
-            }
-
-            System.out.println("Algorithm: " + algorithm);
-            //System.out.println("Keysize: " + keysize);
-
-            String mode;
-            boolean ivNeeded = false;
-            nList = document.getElementsByTagName("mode");
-            if(data.getMode() != -1) {
-                node = nList.item(data.getMode());
-                eElement = (Element) node;
-                eElement.getElementsByTagName("name").item(0).getTextContent();
-                mode = eElement.getElementsByTagName("name").item(0).getTextContent();
-                eElement.getElementsByTagName("iv").item(0).getTextContent();
-                ivNeeded = Boolean.parseBoolean(eElement.getElementsByTagName("iv").item(0).getTextContent());
-            }else{
-                mode = "notAvailable";
-            }
-
-            System.out.println("Mode: " + mode);
-            System.out.println("IV: " + ivNeeded);
-
-            String padding;
-            if(data.getMode() != -1) {
-                nList = document.getElementsByTagName("padding");
-                node = nList.item(data.getPad());
-                eElement = (Element) node;
-                eElement.getElementsByTagName("name").item(0).getTextContent();
-                padding = eElement.getElementsByTagName("name").item(0).getTextContent();
-            }else{
-                padding = "notAvailable";
-            }
-
-            System.out.println("Padding: " + padding);
-
-            //decryption pass
-            Cipher cipher;
-            if(data.getPbe() == true) {
-
+            System.out.println("PBE: "+data.getPbe());
+            //Alertbox
+            if(data.getPbe()){
                 System.out.println("PBE");
                 AlertBox.display("Password", "Please Close");
                 password = AlertBox.password;
 
                 System.out.println("USER PASSWORD: "+Arrays.toString(password));
-
                 char[] checkPassword = settingsManager.getPassword(data.getIterationCount(), currentKeyPath);
                 System.out.println("Hier 2.Key: "+Arrays.toString(checkPassword));
 
                 if(Arrays.toString(password).equals(Arrays.toString(checkPassword))) {
-                    cipher = Cipher.getInstance(algorithm, "BC");
-
-                    //password = data.getPassword().toCharArray();
-                    byte[] salt = data.getSalt();
-                    int iterationCount = data.getIterationCount();
-
-                    PBEKeySpec pbeSpec = new PBEKeySpec(password, salt, iterationCount+213);
-                    SecretKeyFactory keyFact = SecretKeyFactory.getInstance(algorithm, "BC");
-                    cipher = Cipher.getInstance(algorithm, "BC");
-                    Key sKey = keyFact.generateSecret(pbeSpec);
-
-                    IvParameterSpec ivSpec = new IvParameterSpec(data.iv);
-
-                    System.out.println("PASSWORD: " + Arrays.toString(pbeSpec.getPassword()));
-                    cipher.init(Cipher.DECRYPT_MODE, sKey, ivSpec);
-
-                    // decryption pass
-                    System.out.println("Decrypt Text: " + text);
-                    //Decode text into cipherTextRead input array
-                    byte[] cipherText = Base64.decode(text.getBytes());
-
-                    System.out.println("TEST2: " + cipherText.length);
-                    byte[] plainText = cipher.doFinal(cipherText);
-
-                    //plainText array to String
-                    String plainTextString = new String(plainText);
-                    System.out.println("Decrypt plainTextString : " + text);
-                    text = plainTextString;
-                    System.out.println("Decrypt TextString : " + text);
-
-                    setPassword("");
+                    System.out.println("CORRECT PASSWORD");
                 }else{
                     System.out.println("WRONG PASSWORD");
                 }
+            }
 
+            //Get Algorithm, Keysize and Blocksize
+            String algorithm;
+            int keysize = data.getKeysize();
+            int blocksize = data.getBlocksize();
+            System.out.println("Algorithm id: " + data.getAlgo());
+            if(data.getAlgo() != -1) {
+                algorithm = settingsManager.getElementName("algorithm", data.getAlgo());
             }else {
-                byte [] keyBytes = null;
+                algorithm = "notAvailable";
+            }
+            System.out.println("Algorithm: " + algorithm);
+            System.out.println("Keysize: " + keysize);
+            System.out.println("Blocksize: " + blocksize);
 
+            //Get Mode and IV
+            String mode;
+            boolean iv = false;
+            if(data.getMode() != -1) {
+                mode = settingsManager.getElementName("mode", data.getMode());
+                iv = Boolean.parseBoolean(settingsManager.getSubelement("mode", data.getMode(), "iv"));
+            }else{
+                mode = "notAvailable";
+            }
+            System.out.println("Mode: " + mode);
+            System.out.println("IV: " + iv);
+
+            //Get Padding
+            String padding;
+            if(data.getMode() != -1) {
+                padding = settingsManager.getElementName("padding", data.getPad());
+            }else{
+                padding = "notAvailable";
+            }
+            System.out.println("Padding: " + padding);
+
+            //Get Hashfunction
+            String hashfunct;
+            if(data.getHash() != -1 && data.getHash() != 0) {
+                hashfunct = settingsManager.getElementName("hashfunction", data.getHash());
+            }else{
+                hashfunct = "notAvailable";
+            }
+            System.out.println("Hashfunction: " + hashfunct);
+
+
+            // decryption pass
+
+            //Cipher
+            Cipher cipher;
+
+            //cipher getInstance()
+            if(data.getMode() == -1) {
+                cipher = Cipher.getInstance(algorithm, "BC");
+            } else {
+                cipher = Cipher.getInstance(algorithm + "/" + mode + "/" + padding, "BC");
+            }
+
+            //Get IterationCount
+            System.out.println("3. ITERATION COUNT: "+data.getIterationCount());
+
+            //Get key
+            Key key;
+            Key hMacKey=null;
+            if(data.getPbe()) {
+                System.out.println("USED PASSWORD: "+Arrays.toString(password));
+                byte[] salt = data.getSalt();
+                int iterationCount = data.getIterationCount();
+                blocksize=8;
+                //Key
+                PBEKeySpec pbeSpec = new PBEKeySpec(password, salt, iterationCount+213);
+                System.out.println("PASSWORD: "+ Arrays.toString(pbeSpec.getPassword()));
+                SecretKeyFactory keyFact = SecretKeyFactory.getInstance(algorithm, "BC");
+                key = keyFact.generateSecret(pbeSpec);
+                if(data.getHMAC()){
+                    byte[] keyBytes = settingsManager.getKey(data.getIterationCount(), currentKeyPath);
+                    hMacKey = new SecretKeySpec(keyBytes, hashfunct);
+                }
+                setPassword("");
+            }else {
+                //Key
+                byte[] keyBytes = null;
                 keyBytes = settingsManager.getKey(data.getIterationCount(), currentKeyPath);
-                System.out.println("Hier 2.Key: "+Utils.toHex(keyBytes));
+                System.out.println("KEY DEC: "+Utils.toHex(keyBytes));
+                System.out.println(Utils.toHex(keyBytes).length());
+                key = new SecretKeySpec(keyBytes, algorithm);
+                if(data.getHMAC()){
+                    byte[] keyBytes2 = settingsManager.getKey(data.getIterationCount(), currentKeyPath);
+                    hMacKey = new SecretKeySpec(keyBytes2, hashfunct);
+                }
+                //key = new SecretKeySpec(keyBytes, algorithm);
+            }
 
-                Key decryptionKey = new SecretKeySpec(data.encryptionKey.getEncoded(), data.encryptionKey.getAlgorithm());
 
-                if(data.mode == -1) {
-                    cipher = Cipher.getInstance(algorithm, "BC");
+            //iv + cipher.init()
+            if (iv | data.getPbe()) {
+                IvParameterSpec ivSpec = new IvParameterSpec(data.getIv());
+                cipher.init(Cipher.DECRYPT_MODE, key, ivSpec);
+            } else {
+                cipher.init(Cipher.DECRYPT_MODE, key);
+            }
+
+            System.out.println("Decrypt Text: " + text);
+            //Decode text into cipherTextRead input array
+            byte[] cipherText = Base64.decode(text.getBytes());
+
+            //cipherText + ctLength update()+doFinal()
+            int ctLength = cipherText.length;
+            String plainTextString = null;
+
+            System.out.println("TEST2: " + cipherText.length);
+            byte[] plainText;
+            if(data.getPbe()){
+                plainText = cipher.doFinal(cipherText);
+            }else{
+                plainText = new byte[ctLength];
+            }
+
+            //Message Digest
+            int ptLength;
+            if(hashfunct != "notAvailable"){
+                if(data.getHMAC()){
+                    Mac hMac = Mac.getInstance("Hmac"+hashfunct, "BC");
+                    int messageLength;
+                    if (!data.getPbe()) {
+                        //Decrypt block by block into plainText update()
+                        ptLength = cipher.update(cipherText, 0, ctLength, plainText, 0); // plainText
+                        //Cipher doFinal()
+                        ptLength += cipher.doFinal(plainText, ptLength);
+                        System.out.println("Decrypt plain text : " + Utils.toHex(plainText) + " bytes: " + ptLength);
+                        messageLength = ptLength - hMac.getMacLength();
+                    } else {
+                        messageLength = plainText.length - hMac.getMacLength();
+                    }
+                    hMac.init(hMacKey);
+                    hMac.update(plainText, 0, messageLength);
+
+                    byte[] messageHash = new byte[hMac.getMacLength()];
+                    System.arraycopy(plainText, messageLength, messageHash, 0, messageHash.length);
+
+                    System.out.println("plain: " + Utils.toString(plainText, messageLength) + " verified: " + MessageDigest.isEqual(hMac.doFinal(), messageHash));
+                    //plainText array to String
+                    plainTextString = new String(plainText);
+                    System.out.println("Decrypt plainTextString : " + text);
+                    text = Utils.toString(plainText, messageLength);
                 }else {
-                    cipher = Cipher.getInstance(algorithm + "/" + mode + "/" + padding, "BC");
+                    MessageDigest hash;
+                    int messageLength;
+                    if (!data.getPbe()) {
+                        //Decrypt block by block into plainText update()
+                        ptLength = cipher.update(cipherText, 0, ctLength, plainText, 0); // plainText
+                        //Cipher doFinal()
+                        ptLength += cipher.doFinal(plainText, ptLength);
+                        System.out.println("Decrypt plain text : " + Utils.toHex(plainText) + " bytes: " + ptLength);
+                        hash = MessageDigest.getInstance(hashfunct);
+                        messageLength = ptLength - hash.getDigestLength();
+                    } else {
+                        hash = MessageDigest.getInstance(hashfunct);
+                        messageLength = plainText.length - hash.getDigestLength();
+                    }
+                    hash.update(plainText, 0, messageLength);
+                    byte[] messageHash = new byte[hash.getDigestLength()];
+                    System.arraycopy(plainText, messageLength, messageHash, 0, messageHash.length);
+                    System.out.println("plain: " + Utils.toString(plainText, messageLength) + " verified: " + MessageDigest.isEqual(hash.digest(), messageHash));
+                    //plainText array to String
+                    plainTextString = new String(plainText);
+                    System.out.println("Decrypt plainTextString : " + text);
+                    text = Utils.toString(plainText, messageLength);
+                }
+            }else {
+
+                if(!data.getPbe()) {
+                    //Decrypt block by block into plainText update()
+                    ptLength = cipher.update(cipherText, 0, ctLength, plainText, 0); // plainText
+                    //Cipher doFinal()
+                    ptLength = cipher.doFinal(plainText, ptLength);
+                    System.out.println("Decrypt plain text : " + Utils.toHex(plainText) + " bytes: " + ptLength);
                 }
 
-                //Initialize Cipher
-                if(ivNeeded == true) {
-                    IvParameterSpec ivSpec = new IvParameterSpec(data.iv);
-                    cipher.init(Cipher.DECRYPT_MODE, decryptionKey, ivSpec);
-                }else {
-                    cipher.init(Cipher.DECRYPT_MODE, decryptionKey);
-                }
-
-                // decryption pass
-                System.out.println("Decrypt Text: " + text);
-                //Decode text into cipherTextRead input array
-                byte[] cipherText = Base64.decode(text.getBytes());
-                //Important for the right length
-                int ctLength = cipherText.length;
-                System.out.println("Decrypt cipher text: " + Utils.toHex(cipherText) + " bytes: " + ctLength);
-                //Create plainText output array
-                byte[] plainText = new byte[ctLength];
-
-
-
-                //Decrypt block by block into plainText update()
-                int ptLength = cipher.update(cipherText, 0, ctLength, plainText, 0); // plainText
-                //Cipher doFinal()
-                ptLength += cipher.doFinal(plainText, ptLength);
-                System.out.println("Decrypt plain text : " + Utils.toHex(plainText) + " bytes: " + ptLength);
                 //plainText array to String
-                String plainTextString = new String(plainText);
+                plainTextString = new String (plainText);
                 System.out.println("Decrypt plainTextString : " + text);
                 text = plainTextString;
                 System.out.println("Decrypt TextString : " + text);
-
             }
-
         }
         catch (Exception ex){
             ex.printStackTrace();
@@ -512,6 +549,10 @@ public class FileManager {
     }
 
 
+    /**
+     *
+     * @return
+     */
     public String getKeyFileText (){
         File file = new File("./src/main/java/KeyFile.xml");
 
@@ -541,6 +582,11 @@ public class FileManager {
     }
 
 
+    /**
+     *
+     * @param text
+     * @throws IOException
+     */
     public void saveKeyText (String text) throws IOException {
         try {
             //currentPath is available
@@ -558,49 +604,89 @@ public class FileManager {
     }
 
 
-
     //Set and get currentPath
+    /**
+     *
+     * @param path
+     */
     public void setPath (String path) {
         currentPath = path;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getPath () {
         return currentPath;
     }
 
     //Set and get currentName
+    /**
+     *
+     * @param name
+     */
     public void setFileName (String name) {
         tempName = name;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getFileName () {
         return tempName;
     }
 
+    //Set and get currentKeyPath
+    /**
+     *
+     * @param keypath
+     */
     public void setKeyPath (String keypath) {
         currentKeyPath = keypath;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getKeyPath () {
         return currentKeyPath;
     }
 
-    //Set and get currentName
+    //Set and get currentKeyName
+    /**
+     *
+     * @param keyName
+     */
     public void setKeyFileName (String keyName) {
         tempKeyName = keyName;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getKeyFileName () {
         return tempKeyName;
     }
 
+    //Set Password
+    /**
+     *
+     * @param pw
+     */
     public void setPassword (String pw) {
         System.out.println(pw);
         password = pw.toCharArray();
     }
+    //Get Data
 
-
-    //Data
+    /**
+     *
+     * @return
+     */
     public Data getData () {
         return data;
     }

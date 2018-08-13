@@ -5,40 +5,39 @@ import java.security.Key;
 
 public class Data implements Serializable {
 
-    //PBE
-    boolean pbe = false;
+    //PBE bool
+    private boolean pbe = false;
 
-    //Password
-    String password;
+    //Salt
+    private byte[] salt;
 
-    byte[] salt;
-
-    int iterationCount;
+    //Iterationcount
+    private int iterationCount;
 
     // Key Size
-    int keysize;
-
-    // Key
-    byte[] key;
-
-    //Key
-    Key encryptionKey;
+    private int keysize;
 
     // Algorithm
-    int algo;
+    private int algo;
 
-    int blocksize;
+    private int blocksize;
 
     // Mode
-    int mode;
+    private int mode;
 
     // IV
-    byte[] iv;
+    private byte[] iv;
 
     // Padding
     int pad;
 
-    String ciphertext;
+    //Hashfunction
+    private int hash;
+
+    //HMAC
+    private boolean hmac = false;
+
+    private String ciphertext;
 
     public Data() {
         keysize = 128;
@@ -46,18 +45,16 @@ public class Data implements Serializable {
         blocksize = 16;
         mode = 0;
         pad = 2;
+        hash = 0;
         salt = new byte[]{
                 0x7d, 0x60, 0x43, 0x5f, 0x02, (byte) 0xe9, (byte) 0xe0, (byte) 0xae};
-        iterationCount = 2048;
+        iterationCount = 0;
     }
 
     // Setter and Getter
 
     public void setKeysize (int keysize) { this.keysize = keysize; }
     public int getKeysize () { return this.keysize; }
-
-    public void setKey (byte[] key) { this.key = key; }
-    public byte[] getKey () { return this.key; }
 
     public void setIv (byte[] iv) { this.iv = iv; }
     public byte[] getIv () { return this.iv; }
@@ -71,14 +68,17 @@ public class Data implements Serializable {
     public void setPad (int pad) { this.pad = pad; }
     public int getPad () { return this.pad; }
 
+    public void setHash(int hash) { this.hash = hash; }
+    public int getHash () { return this.hash; }
+
+    public void setHMAC(boolean hmac) { this.hmac = hmac; }
+    public boolean getHMAC () { return this.hmac; }
+
     public void setCiphertext (String ciphertext) { this.ciphertext = ciphertext; }
     public String getCiphertext () { return this.ciphertext; }
 
     public void setPbe (boolean pbe) { this.pbe = pbe; }
     public boolean getPbe () { return this.pbe; }
-
-    public void setPassword (String password) { this.password = password; }
-    public String getPassword () { return this.password; }
 
     public void setSalt (byte[] salt) { this.salt = salt; }
     public byte[] getSalt () { return this.salt; }

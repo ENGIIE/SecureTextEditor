@@ -58,6 +58,10 @@ public class FXMLController {
     private ComboBox cbmode;
     @FXML
     private ComboBox cbpad;
+    @FXML
+    private ComboBox cbhash;
+    @FXML
+    private CheckBox chbhash;
 
 
 
@@ -94,8 +98,6 @@ public class FXMLController {
             node = scene.lookup("#pfpbe");
             PasswordField pfpbe = (PasswordField) node;
             if(!cbpbe.isSelected()){pfpbe.setDisable(true);}else{pfpbe.setDisable(false);}
-            pfpbe.setText(fileManager.getData().getPassword());
-
 
             //ADD Algorithms to ComboBox
             node = scene.lookup("#cbalgo");
@@ -115,12 +117,57 @@ public class FXMLController {
             settingsManager.addAllElements("mode", cbm, fileManager.getData().getPad(), "name");
             cbm.getSelectionModel().select(fileManager.getData().getMode());
 
-
             //ADD Paddings to ComboBox
             node = scene.lookup("#cbpad");
             ComboBox cbp = (ComboBox) node;
             settingsManager.addAllElements("padding", cbp, fileManager.getData().getPad(),"name");
             cbp.getSelectionModel().select(fileManager.getData().getPad());
+
+            //ADD HMACS Checkbox
+            node = scene.lookup("#chbhash");
+            CheckBox chbh = (CheckBox) node;
+            chbh.setSelected(fileManager.getData().getHMAC());
+
+
+            //ADD Hashfunctions to ComboBox
+            node = scene.lookup("#cbhash");
+            ComboBox cbh = (ComboBox) node;
+            settingsManager.addAllElements("hashfunction", cbh, fileManager.getData().getHash(),"name");
+            cbh.getSelectionModel().select(fileManager.getData().getHash());
+
+            //HMACCheckbox initial
+            if(chbh.isSelected() == true){
+                cbh.getItems().clear();
+                settingsManager.getElementsByBoolean("hashfunction", "hmac", cbh);
+                System.out.println("HMAC NAME: " +settingsManager.getElementName("hashfunction", fileManager.getData().getHash()));
+                int index=0;
+                for(int i = 0; i<cbh.getItems().size();i++){
+                    if(cbh.getItems().get(i).toString() == settingsManager.getElementName("hashfunction", fileManager.getData().getHash())){
+                        index = i;
+                    }
+                }
+                cbh.getSelectionModel().select(index);
+            }
+
+            //HMAC Checkbox Listener
+            chbh.selectedProperty().addListener(new ChangeListener<Boolean>() {
+                @Override
+                public void changed(ObservableValue<? extends Boolean> observable, Boolean oldValue, Boolean newValue) {
+                    System.out.println(cbpbe.isSelected());
+                    if(chbh.isSelected() == true){
+                        cbh.getItems().clear();
+                        settingsManager.getElementsByBoolean("hashfunction", "hmac", cbh);
+                        cbh.getSelectionModel().select(fileManager.getData().getHash());
+
+                    }else {
+                        cbh.getItems().clear();
+                        settingsManager.addAllElements("hashfunction", cbh, fileManager.getData().getHash(),"name");
+                        cbh.getSelectionModel().select(0);
+                    }
+                    System.out.println("Changed");
+                }
+            });
+
 
             //PBECheckbox initial
             if(cbpbe.isSelected() == true){
@@ -254,11 +301,13 @@ public class FXMLController {
         System.out.println("Apply");
 
         fileManager.getData().setPbe(cbpbe.isSelected());
-        System.out.println("PBE: "+fileManager.getData().pbe);
-        fileManager.getData().setPassword(pfpbe.getText());
-        System.out.println("PASSWORD: "+fileManager.getData().password);
+        System.out.println("PBE: "+fileManager.getData().getPbe());
+        if(cbpbe.isSelected()) {
+            fileManager.setPassword(pfpbe.getText());
+        }
+        System.out.println("PASSWORD: "+pfpbe.getText());
         fileManager.getData().setAlgo(settingsManager.getIndex("algorithm", cbalgo.getSelectionModel().getSelectedItem().toString()));
-        System.out.println("ALGO: "+fileManager.getData().algo);
+        System.out.println("ALGO: "+fileManager.getData().getAlgo());
         if(!keysize.getItems().isEmpty()){
             System.out.println("KEYSIZE: "+Integer.parseInt(keysize.getSelectionModel().getSelectedItem().toString()));
             fileManager.getData().setKeysize(Integer.parseInt(keysize.getSelectionModel().getSelectedItem().toString()));
@@ -272,13 +321,17 @@ public class FXMLController {
         } else {
             fileManager.getData().setMode(-1);
         }
-        System.out.println("MODE: "+fileManager.getData().mode);
+        System.out.println("MODE: "+fileManager.getData().getMode());
         if(!cbpad.getItems().isEmpty()) {
             fileManager.getData().setPad(settingsManager.getIndex("padding", cbpad.getSelectionModel().getSelectedItem().toString()));
         }else {
             fileManager.getData().setPad(-1);
         }
         System.out.println("PAD: "+fileManager.getData().pad);
+        fileManager.getData().setHMAC(chbhash.isSelected());
+        System.out.println("HMAC: "+fileManager.getData().getHMAC());
+        fileManager.getData().setHash(settingsManager.getIndex("hashfunction", cbhash.getSelectionModel().getSelectedItem().toString()));
+        System.out.println("HASH: "+fileManager.getData().getHash());
         Stage stage = (Stage) apply.getScene().getWindow();
         stage.close();
 
@@ -491,6 +544,7 @@ public class FXMLController {
     @FXML
     protected void handleDECButtonAction(ActionEvent event) throws IOException {
         System.out.println("Open DEC");
+
         //Creating FileChooser
         FileChooser chooser = new FileChooser();
         //Filter only Txt Files

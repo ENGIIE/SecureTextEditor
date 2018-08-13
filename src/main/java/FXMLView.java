@@ -17,7 +17,7 @@ public class FXMLView extends Application {
     public void start(final Stage primaryStage) throws IOException {
 
         // Loading first fxml file to be displayed in parent (root)
-        Parent root = FXMLLoader.load(getClass().getResource("startmenu.fxml"));
+        Parent root = FXMLLoader.load(getClass().getResource("keymenu.fxml"));
 
         // Create new scene with with parent (root)
         Scene scene = new Scene(root, 500, 500);

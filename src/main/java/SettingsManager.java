@@ -184,7 +184,8 @@ public class SettingsManager {
         Node keylist = document.getElementsByTagName("keylist").item(0);
 
         Element key = document.createElement("key");
-        key.appendChild(document.createTextNode(Base64.toBase64String(keystring)));
+        String ks = new String(keystring);
+        key.appendChild(document.createTextNode(ks));
         keylist.appendChild(key);
 
 
@@ -209,7 +210,49 @@ public class SettingsManager {
         byte[] key= null;
 
         NodeList keylist = document.getElementsByTagName("key");
-        key = Base64.decode(keylist.item(count).getTextContent().getBytes());
+        key = Base64.decode(keylist.item(count).getTextContent());
+        System.out.println("HIER1: "+Utils.toHex(key));
+
+
+        setDocument("./src/main/java/Settingsdata.xml");
+
+        return key;
+
+    }
+
+    public void setHMACKey(byte[] keystring, String path) throws TransformerException {
+        setDocument(path);
+
+        Node keylist = document.getElementsByTagName("hmackeylist").item(0);
+
+        Element key = document.createElement("hmackey");
+        String ks = new String(keystring);
+        key.appendChild(document.createTextNode(ks));
+        keylist.appendChild(key);
+
+
+        try {
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            DOMSource domSource = new DOMSource(document);
+            Transformer transformer = null;
+            transformer = transformerFactory.newTransformer();
+            StreamResult streamResult = new StreamResult(new File(path));
+            transformer.transform(domSource, streamResult);
+            System.out.println("DONE");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        setDocument("./src/main/java/Settingsdata.xml");
+    }
+
+    public byte[] getHMACKey(int count, String path){
+        setDocument(path);
+        byte[] key= null;
+
+        NodeList keylist = document.getElementsByTagName("hmac");
+        key = Base64.decode(keylist.item(count).getTextContent());
         System.out.println("HIER1: "+Utils.toHex(key));
 
 
@@ -263,6 +306,49 @@ public class SettingsManager {
 
     }
 
+    public void setHash(String string, String path) throws TransformerException {
+        setDocument(path);
+
+        String hashstring = string;
+        Node hashlist = document.getElementsByTagName("hashlist").item(0);
+
+        Element hash = document.createElement("hash");
+        hash.appendChild(document.createTextNode(hashstring));
+        System.out.println("SAVED HASH: "+ hashstring);
+        hashlist.appendChild(hash);
+
+
+        try {
+            TransformerFactory transformerFactory = TransformerFactory.newInstance();
+            DOMSource domSource = new DOMSource(document);
+            Transformer transformer = null;
+            transformer = transformerFactory.newTransformer();
+            StreamResult streamResult = new StreamResult(new File(path));
+            transformer.transform(domSource, streamResult);
+            System.out.println("DONE");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+
+        setDocument("./src/main/java/Settingsdata.xml");
+    }
+
+    public String getHash(int count, String path){
+        setDocument(path);
+        String hashstring = null;
+
+        NodeList hashlist = document.getElementsByTagName("hash");
+        hashstring = hashlist.item(count).getTextContent();
+        System.out.println("HASH1: "+ hashstring);
+
+
+        setDocument("./src/main/java/Settingsdata.xml");
+
+        return hashstring;
+
+    }
+
     public void setIterationcount(int count, String path){
         setDocument(path);
 
@@ -302,8 +388,15 @@ public class SettingsManager {
 
     }
 
-    public  void setKeyDocument (String path){
-
+    public  String getSubelement (String element, int id, String elements){
+        String content;
+        NodeList nList1 = document.getElementsByTagName(element);
+        org.w3c.dom.Node node = nList1.item(id);
+        Element eElement0 = (Element) node;
+        NodeList nList2 = eElement0.getElementsByTagName(elements);
+        content = nList2.item(0).getTextContent();
+        System.out.println("getSubElement "+content);
+        return content;
     }
 
 }
