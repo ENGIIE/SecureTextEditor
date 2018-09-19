@@ -42,7 +42,7 @@ public class Data implements Serializable {
     public Data() {
         keysize = 128;
         algo = 0;
-        blocksize = 16;
+        blocksize = 0;
         mode = 0;
         pad = 2;
         hash = 0;

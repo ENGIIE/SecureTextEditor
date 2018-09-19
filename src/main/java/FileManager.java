@@ -208,9 +208,11 @@ public class FileManager {
                 SecretKeyFactory keyFact = SecretKeyFactory.getInstance(algorithm, "BC");
                 key = keyFact.generateSecret(pbeSpec);
                 if(data.getHMAC()){
+                    System.out.println("PBE WITH HMAC !!!!!!!!!!!!");
                     hMacKey = new SecretKeySpec(key.getEncoded(), "HMac"+algorithm);
                     settingsManager.setKey(Base64.encode(hMacKey.getEncoded()), currentKeyPath);
                 }else {
+                    System.out.println("PBE !!!!!!!!!!!!");
                     settingsManager.setPassword(password, currentKeyPath);
                 }
                 count++;
@@ -225,11 +227,12 @@ public class FileManager {
                 System.out.println("KEYSIZE: "+data.getKeysize());
                 generator.init(data.getKeysize());
                 key = generator.generateKey();
-                settingsManager.setKey(Base64.encode(key.getEncoded()), currentKeyPath);
                 if(data.getHMAC()){
+                    System.out.println("NO PBE WITH HMAC !!!!!!!!!!!!");
                     hMacKey = new SecretKeySpec(key.getEncoded(), "HMac"+hashfunct);
                     settingsManager.setKey(Base64.encode(hMacKey.getEncoded()), currentKeyPath);
                 } else {
+                    System.out.println("NO PBE!!!!!!!!!!!!");
                     settingsManager.setKey(Base64.encode(key.getEncoded()), currentKeyPath);
                 }
                 System.out.println("KEY ENC: "+Utils.toHex(settingsManager.getKey(data.getIterationCount(), currentKeyPath)));
@@ -261,6 +264,7 @@ public class FileManager {
             //Message Digest
             if(hashfunct != "notAvailable"){
                 if(data.getHMAC()){
+                    System.out.println("HASHFUNCT WITH HMAC !!!!!!!!!!!!");
                     cipherText = new byte[cipher.getOutputSize(text.length() + hMac.getMacLength())];
 
                     ctLength = cipher.update(Utils.toByteArray(text), 0, text.length(), cipherText, 0);
@@ -275,6 +279,7 @@ public class FileManager {
                     byte[] digest = hMac.doFinal();
                     settingsManager.setHash(DatatypeConverter.printHexBinary(digest).toUpperCase(), currentKeyPath);
                 }else {
+                    System.out.println("HASHFUNCT !!!!!!!!!!!!");
                     MessageDigest hash = MessageDigest.getInstance(hashfunct, "BC");
                     cipherText = new byte[cipher.getOutputSize(input.length + hash.getDigestLength())];
                     //Block by block encryption from input into cipherText update()
@@ -289,6 +294,7 @@ public class FileManager {
                 }
 
             }else{
+                System.out.println("NO HASHFUNCT !!!!!!!!!!!!");
                 cipherText = new byte[cipher.getOutputSize(input.length)];
                 //Block by block encryption from input into cipherText update()
                 ctLength = cipher.update(input, 0, input.length, cipherText, 0);

@@ -1,7 +1,4 @@
-
-import org.junit.Assert;
 import org.junit.Test;
-import sun.misc.MessageUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,7 +9,6 @@ import static org.junit.Assert.assertEquals;
 public class FileManagerTest {
 
     FileManager fileManager = new FileManager();
-    StringEqualityTest set = new StringEqualityTest();
 
     //Testinput
     byte[] testinput = new byte[] {

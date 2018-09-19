@@ -188,6 +188,7 @@ public class SettingsManager {
         key.appendChild(document.createTextNode(ks));
         keylist.appendChild(key);
 
+        System.out.println("Key set:" + keystring.toString());
 
         try {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();

@@ -73,7 +73,7 @@
             </keyids>
             <modeids>
             </modeids>
-            <blocksize>8</blocksize>
+            <blocksize>16</blocksize>
         </algorithm>
         <algorithm id="6">
             <name>PBEWithMD5AndDES</name>
@@ -86,7 +86,7 @@
             <blocksize>8</blocksize>
         </algorithm>
         <algorithm id="7">
-            <name>PBEWithSHAAnd40BitRC</name>
+            <name>PBEWithSHAAnd40BitRC4</name>
             <pbe>true</pbe>
             <keyids>
                 <keyid>0</keyid>
@@ -177,19 +177,19 @@
             <name>PKCS7Padding</name>
         </padding>
         <padding id="3">
-            <name>ISO10126-2</name>
+            <name>ISO10126-2Padding</name>
         </padding>
         <padding id="4">
-            <name>ISO7816-4</name>
+            <name>ISO7816-4Padding</name>
         </padding>
         <padding id="5">
-            <name>X9.23</name>
+            <name>X9.23Padding</name>
         </padding>
         <padding id="6">
-            <name>TBC</name>
+            <name>TBCPadding</name>
         </padding>
         <padding id="7">
-            <name>ZeroByte</name>
+            <name>ZeroBytePadding</name>
         </padding>
     </paddings>
     <messagedigests>
