@@ -397,6 +397,9 @@ public class SettingsManager {
         NodeList nList2 = eElement0.getElementsByTagName(elements);
         content = nList2.item(0).getTextContent();
         System.out.println("getSubElement "+content);
+
+        setDocument("./src/main/java/Settingsdata.xml");
+
         return content;
     }
 

@@ -43,6 +43,9 @@ public class FileManager {
     //Iterationcount
     private int count;
 
+    //TEST CASE
+    boolean test = false;
+
 
     /**
      * Constructor
@@ -185,7 +188,7 @@ public class FileManager {
             }
             Mac hMac=null;
             if(data.getHMAC()){
-                hMac = Mac.getInstance("HMac"+hashfunct, "BC");
+                hMac = Mac.getInstance("Hmac"+hashfunct, "BC");
             }
 
             //IterationCount save
@@ -209,7 +212,7 @@ public class FileManager {
                 key = keyFact.generateSecret(pbeSpec);
                 if(data.getHMAC()){
                     System.out.println("PBE WITH HMAC !!!!!!!!!!!!");
-                    hMacKey = new SecretKeySpec(key.getEncoded(), "HMac"+algorithm);
+                    hMacKey = new SecretKeySpec(key.getEncoded(), "Hmac"+algorithm);
                     settingsManager.setKey(Base64.encode(hMacKey.getEncoded()), currentKeyPath);
                 }else {
                     System.out.println("PBE !!!!!!!!!!!!");
@@ -229,7 +232,7 @@ public class FileManager {
                 key = generator.generateKey();
                 if(data.getHMAC()){
                     System.out.println("NO PBE WITH HMAC !!!!!!!!!!!!");
-                    hMacKey = new SecretKeySpec(key.getEncoded(), "HMac"+hashfunct);
+                    hMacKey = new SecretKeySpec(key.getEncoded(), "Hmac"+hashfunct);
                     settingsManager.setKey(Base64.encode(hMacKey.getEncoded()), currentKeyPath);
                 } else {
                     System.out.println("NO PBE!!!!!!!!!!!!");
@@ -338,6 +341,7 @@ public class FileManager {
     public String decryptText (File file) throws IOException {
         //Current Text
         String text = "";
+        System.out.println("DECRYPTION");
         try {
             //Ciphertxt
             ObjectInputStream in = new ObjectInputStream(new FileInputStream(file));
@@ -348,9 +352,12 @@ public class FileManager {
             System.out.println("PBE: "+data.getPbe());
             //Alertbox
             if(data.getPbe()){
-                System.out.println("PBE");
-                AlertBox.display("Password", "Please Close");
-                password = AlertBox.password;
+
+                if(!test) {
+                    System.out.println("PBE");
+                    AlertBox.display("Password", "Please Close");
+                    password = AlertBox.password;
+                }
 
                 System.out.println("USER PASSWORD: "+Arrays.toString(password));
                 char[] checkPassword = settingsManager.getPassword(data.getIterationCount(), currentKeyPath);
@@ -516,7 +523,7 @@ public class FileManager {
                         //Cipher doFinal()
                         ptLength += cipher.doFinal(plainText, ptLength);
                         System.out.println("Decrypt plain text : " + Utils.toHex(plainText) + " bytes: " + ptLength);
-                        hash = MessageDigest.getInstance(hashfunct);
+                        hash = MessageDigest.getInstance(hashfunct, provider);
                         messageLength = ptLength - hash.getDigestLength();
                     } else {
                         hash = MessageDigest.getInstance(hashfunct);
@@ -695,6 +702,10 @@ public class FileManager {
      */
     public Data getData () {
         return data;
+    }
+
+    public void setTest (boolean tst) {
+        test = tst;
     }
 
 }
